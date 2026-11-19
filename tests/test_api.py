@@ -99,7 +99,10 @@ def test_scenario_complet(client):
     assert len(client.get("/api/scenarios").json()["scenarios"]) == 1
 
 
-def test_appli_non_installee(client):
+def test_appli_non_installee(client, tmp_path):
+    import dataclasses
+    g = main.ETAT["gestionnaire"]
+    g.cfg = dataclasses.replace(g.cfg, applis=tmp_path / "aucune-appli")      # dans l'image, toutes sont installées
     r = client.post("/api/applis/gazette/demarrer")
     assert r.status_code == 409 and "pas installée" in r.json()["detail"]
 
