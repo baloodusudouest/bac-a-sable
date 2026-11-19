@@ -38,6 +38,8 @@ que le code.
 
 ## Décisions tranchées
 
+- Image `latest`, mise à jour par Watchtower la nuit (Julien, 19/11/2026 ; avant : version figée dans la stack).
+
 - Une seule appli commune, aucune appli en service modifiée (seule exception : lien dans les Réglages de l'Anneau).
 - Applis lancées depuis les lanceurs de démonstration de leurs dépôts (ils coupent les tâches de fond et branchent
   les faux services) ; lanceurs écrits ici pour carnet (personnes du scénario) et Douze points (pas de démo).

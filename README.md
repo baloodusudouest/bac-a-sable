@@ -31,7 +31,8 @@ toucher à ta vraie connexion. Il ajoute un petit bandeau « Bac à sable » en 
 ## Mettre à jour une appli embarquée
 
 Dans `applis.yaml` : changer `version` et `sha` (commit du dépôt), puis `python tools/dockerfile.py` et pousser :
-l'image est reconstruite, et les essais de bout en bout tournent dans l'image avant publication.
+l'image est reconstruite, et les essais de bout en bout tournent dans l'image avant publication. Sur le NAS,
+le service suit `latest` et Watchtower l'installe la nuit.
 
 ## Développement
 

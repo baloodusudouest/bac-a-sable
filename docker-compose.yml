@@ -7,11 +7,12 @@
 # joindre carnet, par BAC_CARNET_URL, pour copier de vraies fiches (lecture seule) : facultatif.
 services:
   bac-a-sable:
-    image: ghcr.io/baloodusudouest/bac-a-sable:${BAC_VERSION:-latest}
+    image: ghcr.io/baloodusudouest/bac-a-sable:latest
     container_name: bac-a-sable
     restart: unless-stopped
     labels:
-      - com.centurylinklabs.watchtower.enable=false
+      # mis à jour par Watchtower la nuit : il n'écrit nulle part, et la CI essaie les 12 applis avant de publier
+      - com.centurylinklabs.watchtower.enable=true
     networks:
       - bac-a-sable
     ports:
