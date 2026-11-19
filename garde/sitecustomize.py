@@ -113,6 +113,18 @@ socket.gethostbyname = _gethostbyname_garde
 
 # ------------------------------------------------------------------ journal des écritures
 
+def _taille(requete):
+    """0.1.6 : la taille d'une écriture, sans lire le corps. Un envoi en flux (photo de Douze points) n'a pas encore
+    été lu : y toucher (`requete.content`) levait une erreur qui faisait échouer l'envoi vers le faux Immich."""
+    longueur = requete.headers.get("content-length")
+    if longueur and longueur.isdigit():
+        return int(longueur)
+    try:
+        return len(requete.content or b"")
+    except Exception:  # noqa: BLE001 — corps en flux pas encore lu
+        return None
+
+
 def _brancher_httpx() -> None:
     """httpx.MockTransport : les faux services des démonstrations. Chaque écriture y est notée."""
     try:
@@ -127,7 +139,7 @@ def _brancher_httpx() -> None:
         def enveloppe(self, requete, _origine=origine):
             if requete.method in _ECRITURES:
                 noter("ecriture", service=requete.url.host or "?", action=f"{requete.method} {requete.url.path}",
-                      taille=len(requete.content or b"") if hasattr(requete, "content") else None)
+                      taille=_taille(requete))
             return _origine(self, requete)
 
         enveloppe._bac = True

@@ -3,8 +3,11 @@
 Fichier à lire en premier dans une nouvelle session, et à mettre à jour à chaque fin de session, dans le même commit
 que le code.
 
-## État (19/11/2026)
+## État (20/11/2026)
 
+- **0.1.6** (20/11/2026) : Douze points 1.7.1 (erreurs 500 « database is locked » corrigées) ; garde : `_taille()`
+  lit `content-length` au lieu du corps (un envoi en flux vers un faux service échouait). Jamais essayé sur la vraie
+  installation.
 - **0.1.3** (19/11/2026) : Douze points 1.6.2 embarqué ; son lanceur branche le faux Immich des tests de Douze points
   (`tests/test_photos_16.FauxImmich`, clé `cle-de-test`), d'où l'icône 📷 et « Immortaliser ». Repli sur un faux
   minimal si ce module manque (dépôt plus ancien).

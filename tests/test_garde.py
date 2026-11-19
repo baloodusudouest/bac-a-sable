@@ -89,3 +89,23 @@ def test_machine_locale_permise_et_ecritures_notees(tmp_path):
     assert {"service": "immich", "action": "POST /api/albums"} in [{k: x[k] for k in ("service", "action")} for x in ecritures]
     assert any(x["action"].startswith("PUT /api/assets/x") for x in ecritures)
     assert not any("GET" in x["action"] for x in ecritures)        # les lectures ne sont pas des écritures
+
+
+def test_envoi_en_flux_vers_un_faux_service(tmp_path):
+    """0.1.6 : un envoi en flux (la photo de Douze points vers le faux Immich) passe, et sa taille est notée.
+    Avant, la garde lisait `requete.content` d'un corps pas encore lu : « Attempted to access streaming request
+    content, without having called `read()` », et l'envoi échouait."""
+    j = tmp_path / "j.jsonl"
+    code = ("import httpx\n"
+            "def rep(r):\n"
+            "    return httpx.Response(201, json={'taille': len(r.read())})\n"
+            "def flux():\n"
+            "    yield b'a' * 1000\n"
+            "    yield b'b' * 500\n"
+            "c = httpx.Client(transport=httpx.MockTransport(rep))\n"
+            "print(c.post('http://immich/api/assets', content=flux()).json()['taille'])\n"
+            "print(c.post('http://immich/api/assets', content=b'x' * 42, headers={'content-length': '42'}).status_code)\n")
+    r = lancer(code, j)
+    assert r.stdout.split() == ["1500", "201"], r.stdout + r.stderr
+    tailles = [x.get("taille") for x in lignes(j) if x["sorte"] == "ecriture"]
+    assert tailles[-1] == 42 and len(tailles) == 2

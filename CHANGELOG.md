@@ -1,5 +1,14 @@
 # Journal des versions
 
+## 0.1.6 — 20/11/2026
+
+- **Douze points 1.7.1** embarqué : plus d'erreurs 500 « database is locked » quand plusieurs téléphones notent en même
+  temps (cause trouvée grâce à Journal › Erreurs de l'appli).
+- **Garde** : un envoi en flux vers un faux service (la photo de Douze points vers le faux Immich) n'échoue plus. La
+  garde lisait le corps pas encore lu pour noter sa taille (« Attempted to access streaming request content… ») ; elle
+  prend maintenant la taille dans l'en-tête `content-length`, ou ne la note pas.
+- Test : `test_envoi_en_flux_vers_un_faux_service`.
+
 ## 0.1.5 — 19/11/2026
 
 - **Douze points 1.7.0** embarqué (animation du dernier vote du public, télé et téléphones).
