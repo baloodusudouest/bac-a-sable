@@ -1,0 +1,30 @@
+# Tests de l'API (sans réseau, sans appli embarquée), Dockerfile à jour, interface compilée : à chaque push et PR
+name: Tests
+on:
+  push:
+    branches-ignore: [main]   # sur main, docker.yml appelle ces tests avant de construire l'image
+  pull_request:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+      - run: python tools/dockerfile.py --verifier
+      - run: python -m pytest -q
+  interface:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: cd frontend && npm ci && npx vite build

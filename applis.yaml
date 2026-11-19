@@ -1,0 +1,189 @@
+# Bac à sable — les applis maison embarquées.
+#
+# Une entrée par appli. Mettre à jour une appli simulée : changer `version` (étiquette de son image ghcr,
+# d'où l'on copie son site-packages et son interface bâtie) et `sha` (commit de son dépôt, d'où l'on copie
+# le code, les tests et le lanceur de démonstration), puis `python tools/dockerfile.py` et republier l'image.
+#
+# Champs :
+#   nom         nom affiché
+#   depot       dépôt public baloodusudouest/<depot>
+#   version     version embarquée (étiquette de l'image)
+#   sha         commit du dépôt pour cette version
+#   port        port publié par le Bac à sable (le relais) ; l'appli elle-même écoute sur port + 1000, en local
+#   lanceur     « demo » (lanceur de démonstration du dépôt) ou « bac » (lanceur écrit ici, dans lanceurs/)
+#   module      module ou script lancé (pour « demo »)
+#   args        arguments, avec {dossier} et {port} ; pour « bac » : ignoré
+#   env         variables propres à ce lancement (jamais une vraie adresse ni une vraie clé)
+#   mot_de_passe  mot de passe de la démonstration : le relais se connecte seul avec lui
+#   site        dossier site-packages dans l'image de l'appli
+#   static      dossier de l'interface bâtie dans l'image de l'appli
+#   personnes   « oui » si le scénario y verse des personnes (sinon : données de démonstration du dépôt)
+#   memoire     mémoire maximale, en Mo (le processus est arrêté au-delà)
+
+applis:
+  anneau:
+    nom: L'Anneau
+    depot: anneau
+    version: 0.14.0
+    sha: e4e7f87d6e3843e4ba9a69bce629613b35db30e9
+    port: 8110
+    lanceur: demo
+    module: tests.interface.serveur
+    args: ["{dossier}", "{port}"]
+    mot_de_passe: essai-essai-essai
+    site: /usr/local/lib/python3.12/site-packages
+    static: /app/app/static
+    personnes: non
+    memoire: 300
+  carnet:
+    nom: carnet
+    depot: carnet
+    version: 3.2.0
+    sha: b1ad3dd0bfb5dd6cdec130c8653c5d830f52f43c
+    port: 8111
+    lanceur: bac
+    mot_de_passe: essai-bac-a-sable
+    site: /usr/local/lib/python3.12/site-packages
+    static: /app/app/static
+    personnes: oui
+    memoire: 500
+  chambre-noire:
+    nom: Chambre noire
+    depot: chambre-noire
+    version: 0.8.0
+    sha: 1cb43739c9e7b5006723e7b843c8df56b1b28ecf
+    port: 8112
+    lanceur: demo
+    module: tools.demo
+    args: []
+    env: {DEMO_PORT: "{port}"}
+    mot_de_passe: demonstration-12
+    site: /usr/local/lib/python3.12/site-packages
+    static: /app/app/static
+    personnes: non
+    memoire: 300
+  comptoir:
+    nom: Comptoir
+    depot: comptoir
+    version: 0.7.0
+    sha: 54fcbb82fcca4146e7c86d5eaeadc9c2bd94ac89
+    port: 8113
+    lanceur: demo
+    module: tools.demo
+    args: ["{port}"]
+    mot_de_passe: demo-demo-demo
+    site: /usr/local/lib/python3.12/site-packages
+    static: /app/app/static
+    personnes: non
+    memoire: 300
+  douze-points:
+    nom: Douze points
+    depot: douze-points
+    version: 1.6.0
+    sha: ead4dde98d62d2d09ea8b9dd46e979f24573ee53
+    port: 8114
+    lanceur: bac
+    mot_de_passe: essai-bac-a-sable
+    site: /usr/local/lib/python3.12/site-packages
+    static: /app/app/static
+    personnes: oui
+    memoire: 300
+  gazette:
+    nom: Gazette
+    depot: gazette
+    version: 0.27.0
+    sha: 769424879afa639df4fffdb05f0d7c5c79e9aac8
+    port: 8115
+    lanceur: demo
+    module: tools.demo
+    args: ["{port}"]
+    mot_de_passe: demo-demo-demo
+    site: /usr/local/lib/python3.12/site-packages
+    static: /app/app/static
+    personnes: non
+    memoire: 800
+  kit-urgence:
+    nom: Kit d'urgence
+    depot: kit-urgence
+    version: 2.6.1
+    sha: daf92e2b3521ae83185586a97eb82b10c716aa75
+    port: 8116
+    lanceur: demo
+    module: tests.interface.serveur
+    args: ["{port}"]
+    env: {KIT_SANS_SCRUTATION: "1"}
+    mot_de_passe: mot-de-passe-essai
+    site: /usr/local/lib/python3.12/site-packages
+    static: /app/app/static
+    personnes: non
+    memoire: 400
+  millesime:
+    nom: Millésime
+    depot: millesime
+    version: 2.14.0
+    sha: 4545eb27b37cb66f96a8e077133f47e359c3729b
+    port: 8117
+    lanceur: demo
+    module: tests.interface.serveur
+    args: ["{dossier}", "{port}"]
+    mot_de_passe: essai-essai-essai
+    site: /usr/local/lib/python3.12/site-packages
+    static: /srv/app/static
+    personnes: non
+    memoire: 400
+  scriptorium:
+    nom: Scriptorium
+    depot: scriptorium
+    version: 0.7.0
+    sha: 19441664793f6062d08da5d63edf87ee45459b4f
+    port: 8118
+    lanceur: demo
+    module: tools.demo
+    args: ["{port}"]
+    mot_de_passe: demo-demo-demo
+    site: /usr/local/lib/python3.12/site-packages
+    static: /app/app/static
+    personnes: non
+    memoire: 500
+  sillage:
+    nom: Sillage
+    depot: sillage
+    version: 0.20.0
+    sha: d2304078d24c57c00c8cc5fc4ff7a8b11d3bb83c
+    port: 8119
+    lanceur: demo
+    module: tests.interface.serveur
+    args: ["{dossier}", "{port}"]
+    mot_de_passe: essai-essai-essai
+    site: /usr/local/lib/python3.12/site-packages
+    static: /app/app/static
+    personnes: non
+    memoire: 300
+  transhumance:
+    nom: Transhumance
+    depot: transhumance
+    version: 0.8.0
+    sha: 1ce1a5aeab981d24daad387ff9147add664772ad
+    port: 8120
+    lanceur: demo
+    module: tests.interface.serveur
+    args: ["{dossier}", "{port}"]
+    mot_de_passe: essai-essai
+    site: /usr/local/lib/python3.12/site-packages
+    static: /app/app/static
+    personnes: non
+    memoire: 300
+  ephemeride:
+    nom: Éphéméride
+    depot: verif-dates-photos
+    version: 3.3.0
+    sha: 49b8c22c7daaef5fd853368c10f64ff952333a98
+    port: 8121
+    lanceur: demo
+    module: tests/interface/serveur.py
+    args: ["{dossier}", "{port}"]
+    mot_de_passe: essai-ephemeride
+    site: /venv/lib/python3.12/site-packages
+    static: /srv/app/static
+    personnes: non
+    memoire: 400

@@ -1,0 +1,11 @@
+.git
+.github
+.env
+**/__pycache__
+.pytest_cache
+frontend/node_modules
+app/static
+tests
+tools
+data
+# docs/ est lu par la page « Documents » (0.4) : ne pas l'exclure
