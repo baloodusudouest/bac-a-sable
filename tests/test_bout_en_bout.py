@@ -123,6 +123,7 @@ def test_chaque_appli_demarre_et_s_ouvre_par_le_relais(client, ident):
     page = asyncio.run(par_le_relais(ident, "GET", "/", cookies=cookies_du_bac(client)))
     if page.status_code == 200 and "text/html" in page.headers.get("content-type", ""):
         assert "bac-a-sable-bandeau" in page.text               # le bandeau
+        assert "bac-a-sable-filigrane" in page.text             # le filigrane (0.1.2)
     journal = client.get("/api/journal", params={"appli": ident}).json()["lignes"]
     fuites = [x for x in journal if x["sorte"] == "sortie_refusee"]
     client.post(f"/api/applis/{ident}/arreter")

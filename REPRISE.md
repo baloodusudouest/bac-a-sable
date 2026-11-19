@@ -5,6 +5,8 @@ que le code.
 
 ## État (19/11/2026)
 
+- **0.1.2** (19/11/2026) : filigrane « BAC À SABLE — <appli> <version> — simulation » sur tous les écrans (relais pour
+  les applis simulées, `Filigrane.svelte` pour l'écran du Bac à sable). Les deux dessins doivent rester pareils.
 - **0.1.1** (19/11/2026) : journal du conteneur lisible (relais sans `log_config`, ligne « prêt » avec l'autotest).
   Premier démarrage sur le NAS vu dans les journaux de Julien : conteneur lancé (UID 1026), avertissements
   « Invalid HTTP request received » = accès en https à un port http.

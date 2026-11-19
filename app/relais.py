@@ -10,7 +10,8 @@ Ce que fait le relais, pour chaque requête :
 3. il retire TOUS les cookies du navigateur et présente à l'appli sa propre session simulée (connexion faite par
    le relais lui-même, avec le mot de passe de démonstration de l'appli) ;
 4. il retire tous les `Set-Cookie` de la réponse : aucune appli simulée ne touche aux cookies du navigateur ;
-5. il ajoute le bandeau « Bac à sable » en haut des pages.
+5. il ajoute le bandeau « Bac à sable » en haut des pages et un filigrane sur tout l'écran (0.1.2), pour qu'une
+   capture d'écran d'une appli simulée se reconnaisse.
 """
 from __future__ import annotations
 
@@ -22,6 +23,8 @@ import httpx
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, Response, StreamingResponse
 from starlette.websockets import WebSocket
+
+from . import filigrane
 
 journal = logging.getLogger("bac-a-sable.relais")
 
@@ -143,7 +146,8 @@ class Relais:
             if "text/html" in type_:
                 texte = (await r.aread()).decode(r.encoding or "utf-8", errors="replace")
                 await r.aclose()
-                bandeau = BANDEAU.format(nom=self.appli.nom, version=self.appli.version)
+                bandeau = BANDEAU.format(nom=self.appli.nom, version=self.appli.version) \
+                    + filigrane.html(self.appli.nom, self.appli.version)
                 texte = texte.replace("</body>", bandeau + "</body>", 1) if "</body>" in texte else texte + bandeau
                 return Response(texte, status_code=r.status_code, headers=dict(entetes), media_type="text/html")
             contenu = await r.aread()

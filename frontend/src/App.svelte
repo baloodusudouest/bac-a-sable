@@ -10,6 +10,7 @@
   import ScrollText from '@lucide/svelte/icons/scroll-text'
   import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal'
   import { api } from '$lib/api.js'
+  import Filigrane from '$lib/Filigrane.svelte'
   import Connexion from './pages/Connexion.svelte'
   import Applis from './pages/Applis.svelte'
   import Soiree from './pages/Soiree.svelte'
@@ -55,6 +56,9 @@
 </script>
 
 <svelte:window onhashchange={() => (page = lirePage())} onbac-deconnecte={() => (connecte = false)} />
+
+<!-- 0.1.2 : filigrane sur tous les écrans, connexion comprise (reconnaître une capture du Bac à sable) -->
+<Filigrane sousTitre={`Bac à sable ${session.version || ''} — écran de pilotage`.replace('  ', ' ')} />
 
 {#if connecte === false}
   <Connexion onconnecte={verifier} />

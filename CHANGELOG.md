@@ -1,5 +1,13 @@
 # Journal des versions
 
+## 0.1.2 — 19/11/2026
+
+- **Filigrane** sur tous les écrans : « BAC À SABLE » en diagonale, répété, avec le nom et la version de l'appli
+  (« carnet 3.2.0 — simulation »), cyan peu opaque, sans bloquer aucun clic. Posé par le relais sur chaque page des
+  applis simulées (mur de téléphones compris) et sur l'écran du Bac à sable lui-même (« écran de pilotage »). Une
+  capture d'écran d'un écran du Bac à sable se reconnaît ainsi au premier coup d'œil. `app/filigrane.py`,
+  `frontend/src/lib/Filigrane.svelte` (même dessin), test `tests/test_filigrane.py`.
+
 ## 0.1.1 — 19/11/2026
 
 - Journal du conteneur lisible : les serveurs du relais ne changent plus le niveau du journal commun d'uvicorn
