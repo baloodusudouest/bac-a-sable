@@ -5,7 +5,6 @@
 .pytest_cache
 frontend/node_modules
 app/static
-tests
 tools
 data
-# docs/ est lu par la page « Documents » (0.4) : ne pas l'exclure
+# tests/ entre dans l'image : la CI y lance les essais de bout en bout (les 12 applis embarquées)
