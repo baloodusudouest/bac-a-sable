@@ -1,5 +1,10 @@
 # Journal des versions
 
+## 0.1.3 — 19/11/2026
+
+- **Douze points 1.6.2 embarqué, avec un faux Immich** (remarque de Julien du 19/11/2026 : ni icône 📷 ni bandeau photo). Douze points n'affiche les photos que si Immich est réglé ; son lanceur (`lanceurs/douze_points.py`) lui donne maintenant le faux Immich de ses propres tests (`httpx.MockTransport`, rien ne sort du processus). L'icône 📷 et « Immortaliser » paraissent sur les téléphones ; chaque photo envoyée est notée au journal (« aurait écrit chez immich.bac-a-sable »). Douze points 1.6.1 et 1.6.2 viennent avec : points du public dans l'ordre du jury, prénoms des jumeaux en entier, jumeau toujours affiché.
+- Test de bout en bout : la porte invité de la soirée simulée annonce les photos actives.
+
 ## 0.1.2 — 19/11/2026
 
 - **Filigrane** sur tous les écrans : « BAC À SABLE » en diagonale, répété, avec le nom et la version de l'appli

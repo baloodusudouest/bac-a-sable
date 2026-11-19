@@ -60,6 +60,8 @@ def test_soiree_douze_points_complete(client):
     # un vrai téléphone, sans connexion au Bac à sable, passe par la porte invité
     porte = asyncio.run(par_le_relais("douze-points", "GET", f"/invite/{etat['jeton_invite']}/api/etat"))
     assert porte.status_code == 200 and porte.json()["etat"] == "ouverte"
+    # 0.1.3 : Douze points a son faux Immich, l'icône 📷 et « Immortaliser » paraissent sur les téléphones
+    assert porte.json()["photos"]["actives"] is True
     client.post("/api/applis/douze-points/arreter")
 
 

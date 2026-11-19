@@ -5,6 +5,9 @@ que le code.
 
 ## État (19/11/2026)
 
+- **0.1.3** (19/11/2026) : Douze points 1.6.2 embarqué ; son lanceur branche le faux Immich des tests de Douze points
+  (`tests/test_photos_16.FauxImmich`, clé `cle-de-test`), d'où l'icône 📷 et « Immortaliser ». Repli sur un faux
+  minimal si ce module manque (dépôt plus ancien).
 - **0.1.2** (19/11/2026) : filigrane « BAC À SABLE — <appli> <version> — simulation » sur tous les écrans (relais pour
   les applis simulées, `Filigrane.svelte` pour l'écran du Bac à sable). Les deux dessins doivent rester pareils.
 - **0.1.1** (19/11/2026) : journal du conteneur lisible (relais sans `log_config`, ligne « prêt » avec l'autotest).
