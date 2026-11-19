@@ -129,3 +129,12 @@ def test_erreurs_de_l_appli_lisibles(client):
     r = client.get("/api/applis/douze-points/sortie").json()
     assert r["erreurs"] == 2 and r["lignes"][-1].endswith("database is locked")
     assert client.get("/api/applis/inconnue/sortie").status_code == 404
+
+
+def test_page_invite_de_douze_points():
+    """0.1.5 : ce qui vient d'une page invité passe sans la session de l'hôte (Douze points seulement)."""
+    from app.relais import page_invite
+    assert page_invite("douze-points", "/invite/abc/api/etat", "")
+    assert page_invite("douze-points", "/api/session", "http://h:8114/invite/abc#saisie=x")
+    assert not page_invite("douze-points", "/api/session", "http://h:8114/")
+    assert not page_invite("carnet", "/invite/abc", "")

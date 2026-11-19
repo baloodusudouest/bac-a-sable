@@ -8,6 +8,8 @@ que le code.
 - **0.1.3** (19/11/2026) : Douze points 1.6.2 embarqué ; son lanceur branche le faux Immich des tests de Douze points
   (`tests/test_photos_16.FauxImmich`, clé `cle-de-test`), d'où l'icône 📷 et « Immortaliser ». Repli sur un faux
   minimal si ce module manque (dépôt plus ancien).
+- **0.1.5** (19/11/2026) : Douze points 1.7.0 ; pages invité de Douze points relayées sans la session de l'hôte
+  (`relais.page_invite`, d'après le chemin `/invite/…` ou le `Referer`).
 - **0.1.4** (19/11/2026) : Journal › « Erreurs de l'appli » (`/api/applis/{appli}/sortie`) ; message clair sous un
   téléphone en erreur. **Ouvert** : erreurs 500 de Douze points 1.6.2 sur `/invite/…/api/prenom` et `/api/note` vues
   sur le NAS (5 téléphones sur 7), pas reproduites ici ; lire la cause dans ce nouvel écran.

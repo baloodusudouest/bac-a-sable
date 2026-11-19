@@ -1,5 +1,13 @@
 # Journal des versions
 
+## 0.1.5 — 19/11/2026
+
+- **Douze points 1.7.0** embarqué (animation du dernier vote du public, télé et téléphones).
+- **Téléphones vus comme des invités** : le relais ne présente plus la session de l'hôte aux pages invité de Douze
+  points (`/invite/…`) ni à ce qu'elles appellent (en-tête `Referer`). Avant, chaque téléphone du mur (et un vrai
+  iPhone passé par le QR code) était pris pour l'hôte et montrait les boutons « Revenir » / « Suivant ». Douze points,
+  lui, les réservait déjà à l'hôte. `relais.page_invite`, tests.
+
 ## 0.1.4 — 19/11/2026
 
 - **Journal › Erreurs de l'appli** : la fin du journal du processus de chaque appli simulée (erreurs Python

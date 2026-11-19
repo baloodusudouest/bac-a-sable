@@ -81,6 +81,11 @@ def test_relais_garde_les_cookies(client):
     assert "set-cookie" not in r.headers
     # et la requête suivante se reconnecte seule
     assert asyncio.run(par_le_relais("douze-points", "GET", "/api/soirees", cookies=vrais)).status_code == 200
+    # 0.1.5 : depuis une page invité (/invite/…), Douze points ne voit pas l'hôte : pas de boutons Revenir / Suivant
+    hote = asyncio.run(par_le_relais("douze-points", "GET", "/api/session", cookies=vrais)).json()
+    invite = asyncio.run(par_le_relais("douze-points", "GET", "/api/session", cookies=vrais,
+                                       headers={"referer": "http://192.0.2.50:8114/invite/abc"})).json()
+    assert hote["connecte"] is True and invite["connecte"] is False
     client.post("/api/applis/douze-points/arreter")
 
 

@@ -18,6 +18,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from http.cookies import SimpleCookie
+from urllib.parse import urlsplit
 
 import httpx
 from starlette.requests import Request
@@ -37,6 +38,15 @@ BANDEAU = (
     'letter-spacing:.04em;color:#062a2e;background:repeating-linear-gradient(135deg,#5cc6d6 0 10px,#7fd4e0 10px 20px);'
     'padding:1px 10px;border-radius:999px;box-shadow:0 1px 6px rgba(0,0,0,.35);opacity:.92">'
     'Bac à sable</div>')
+
+
+def page_invite(ident: str, chemin: str, referer: str) -> bool:
+    """0.1.5 : une requête qui vient d'une page invité de Douze points (/invite/…, ou appelée depuis elle).
+    Elle passe SANS la session de l'appli simulée : le téléphone (simulé ou vrai iPhone) est vu comme un invité,
+    pas comme l'hôte (avant, tous les téléphones du mur avaient les boutons Revenir / Suivant de l'hôte)."""
+    if ident != "douze-points":
+        return False
+    return chemin.startswith("/invite/") or "/invite/" in urlsplit(referer or "").path
 
 
 def portes_publiques(ident: str, chemin: str) -> bool:
@@ -77,7 +87,7 @@ class Relais:
         entetes["accept-encoding"] = "identity"
         entetes["x-forwarded-host"] = request.headers.get("host", "")
         entetes["x-forwarded-proto"] = request.url.scheme
-        if self.session:
+        if self.session and not page_invite(self.ident, request.url.path, request.headers.get("referer", "")):
             entetes["cookie"] = "; ".join(f"{k}={v}" for k, v in self.session.items())
         return entetes
 
