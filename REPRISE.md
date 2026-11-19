@@ -10,14 +10,15 @@ que le code.
   Douze points, Sillage, Comptoir (soirée complète : 4 téléphones notent et envoient ; carnet reçoit les personnes
   du scénario ; relais : cookies protégés, reconnexion après « Se déconnecter »). Écrans vérifiés sur PC et
   iPhone (aucune erreur de page, aucun débordement).
-- **Jamais essayé** : l'image complète (les 12 applis construites ensemble), les 8 autres applis embarquées
-  (la CI les essaie dans l'image), la copie depuis le vrai carnet, l'installation sur le NAS, un vrai iPhone sur la
-  soirée simulée, Chromium de Gazette derrière le proxy inexistant.
+- **CI verte le 19/11/2026** : image `0.1.0` publiée ; dans l'image, 35 essais sur 35 (les 12 applis démarrent et
+  s'ouvrent par le relais, soirée Douze points, carnet) ; conteneur démarré, autotest « coupure » vert.
+- **Jamais essayé** : l'installation sur le NAS (service ajouté à la stack du coffre le 19/11, pas encore déployé ;
+  réseau `bac-a-sable` en 192.168.96.0/20, absent du pare-feu de DSM), la copie depuis le vrai carnet, un vrai
+  iPhone sur la soirée simulée, Chromium de Gazette derrière le proxy inexistant.
 
 ## Prochaine étape
 
-1. Vérifier que la CI (Tests, Image Docker) est verte ; corriger l'appli embarquée qui ne démarre pas (test de fumée
-   `test_chaque_appli_demarre_et_s_ouvre_par_le_relais`).
+1. Paquet ghcr `bac-a-sable` : le rendre public si Portainer ne peut pas le tirer (paquet neuf, privé par défaut).
 2. Installer sur le NAS (stack), lancer l'autotest avec `BAC_AUTOTEST` (adresses réelles de la maison).
 3. Verser les personnes du scénario dans d'autres applis (Gazette, Sillage, Kit d'urgence) : un lanceur par appli
    dans `lanceurs/`, sur le modèle de `lanceurs/carnet.py`.
