@@ -193,7 +193,9 @@ async def servir(relais: list[Relais], hote: str = "0.0.0.0") -> list[asyncio.Ta
     import uvicorn
     taches = []
     for r in relais:
-        config = uvicorn.Config(r, host=hote, port=r.appli.port, log_level="warning", lifespan="off",
+        # log_config et log_level à None : ne pas toucher au journal commun d'uvicorn (sinon le niveau « warning »
+        # s'applique aussi au serveur du Bac à sable et masque « Application startup complete », 0.1.1)
+        config = uvicorn.Config(r, host=hote, port=r.appli.port, log_config=None, log_level=None, lifespan="off",
                                 proxy_headers=True, access_log=False)
         serveur = uvicorn.Server(config)
         # _serve : sans reprendre les signaux d'arrêt (c'est le serveur du Bac à sable qui les tient)

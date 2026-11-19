@@ -1,5 +1,13 @@
 # Journal des versions
 
+## 0.1.1 — 19/11/2026
+
+- Journal du conteneur lisible : les serveurs du relais ne changent plus le niveau du journal commun d'uvicorn
+  (« Application startup complete » et « Uvicorn running on » étaient masqués) ; une ligne « Bac à sable … prêt »
+  donne les ports et le résultat de l'autotest.
+- Rappel : « Invalid HTTP request received » veut dire qu'on a parlé en https à un port http (le Bac à sable n'a pas
+  de https : ouvrir http://<NAS>:8104).
+
 ## 0.1.0 — 19/11/2026
 
 Première version (dossier `docs/dossier.md`, deux passages du conseil).

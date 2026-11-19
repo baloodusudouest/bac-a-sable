@@ -100,6 +100,11 @@ async def cycle(app: FastAPI):
     taches = [asyncio.create_task(gestion.veiller()), asyncio.create_task(_purger_copies())]
     if c.relais:
         taches += await servir(list(relais.values()))
+    # 0.1.1 : une ligne claire dans le journal du conteneur (Portainer)
+    ports = sorted(a.port for a in gestion.applis.values())
+    logging.getLogger("uvicorn.error").warning(
+        "Bac à sable %s prêt : écran sur le port %s (http), applis simulées sur %s à %s ; autotest : %s",
+        __version__, gestion.cfg_port_bac, ports[0], ports[-1], ETAT["autotest"]["message"])
     try:
         yield
     finally:

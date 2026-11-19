@@ -5,6 +5,9 @@ que le code.
 
 ## État (19/11/2026)
 
+- **0.1.1** (19/11/2026) : journal du conteneur lisible (relais sans `log_config`, ligne « prêt » avec l'autotest).
+  Premier démarrage sur le NAS vu dans les journaux de Julien : conteneur lancé (UID 1026), avertissements
+  « Invalid HTTP request received » = accès en https à un port http.
 - **0.1.0** : première version (voir `CHANGELOG.md`, `docs/dossier.md`). Port 8104 (écran), 8110-8121 (applis).
 - Testé ici : API, garde, personnes (20 essais sans réseau) ; bout en bout avec de vrais processus pour carnet,
   Douze points, Sillage, Comptoir (soirée complète : 4 téléphones notent et envoient ; carnet reçoit les personnes
@@ -33,6 +36,9 @@ que le code.
 - Millésime sur ses faux services (âges inventés) : on teste les écrans, pas la datation.
 
 ## Pièges
+
+- Pas de https : « Invalid HTTP request received » dans le journal = un navigateur (ou l'adresse Tailscale en
+  `https://`) qui parle https au port 8104 ou 8110-8121.
 
 - Le mot de passe de démonstration de chaque appli est dans `applis.yaml` : s'il change dans le dépôt, le relais ne se
   connecte plus (le test de fumée le voit).
