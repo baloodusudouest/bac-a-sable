@@ -220,6 +220,11 @@ class Regie:
         except asyncio.CancelledError:
             t.etat = "arrêté"
             raise
+        except httpx.HTTPStatusError as exc:
+            t.etat = "erreur"
+            route = exc.request.url.path.rsplit("/api/", 1)[-1]
+            t.erreur = (f"Douze points a répondu {exc.response.status_code} à « {route} » : la cause est dans "
+                        "Journal › Erreurs de l'appli (Douze points).")
         except (httpx.HTTPError, KeyError, ValueError) as exc:
             t.etat = "erreur"
             t.erreur = str(exc)[:200]

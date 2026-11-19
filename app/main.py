@@ -507,6 +507,21 @@ def lire_journal(appli: str = "", sorte: str = "", limite: int = 300):
     return {"lignes": lignes[:max(1, min(limite, 2000))], "compte": compte}
 
 
+@app.get("/api/applis/{ident}/sortie")
+def sortie_appli(ident: str, lignes: int = 300):
+    """0.1.4 : la fin du journal du processus de l'appli simulée (erreurs Python, « Internal Server Error »…),
+    pour comprendre une erreur 500 sans aller chercher le fichier sur le NAS."""
+    connu(ident)
+    chemin = g().dossier(ident) / "sortie.log"
+    try:
+        texte = chemin.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        texte = []
+    fin = texte[-max(20, min(lignes, 3000)):]
+    erreurs = sum(1 for t in texte if t.startswith("Traceback") or "Exception in ASGI application" in t)
+    return {"appli": ident, "lignes": fin, "total": len(texte), "erreurs": erreurs}
+
+
 # ================================================================ autotest, réglages, synthèse
 
 @app.get("/api/autotest")

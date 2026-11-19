@@ -12,8 +12,16 @@
   let sorte = $state('')
   let j = $state(null)
   let minuteur
+  // 0.1.4 : onglet « Erreurs de l'appli » (fin du journal du processus simulé)
+  let vue = $state('ecritures')
+  let sortie = $state(null)
+  async function lireSortie() {
+    if (!appli) { sortie = null; return }
+    sortie = await api.get(`/api/applis/${appli}/sortie?lignes=400`)
+  }
 
   async function lire() {
+    if (vue === 'sortie') return lireSortie()
     const params = new URLSearchParams({ appli, sorte, limite: '400' })
     j = await api.get('/api/journal?' + params)
   }
@@ -37,24 +45,44 @@
   </p>
 </header>
 
+<div class="mb-3 flex gap-1.5">
+  {#each [['ecritures', 'Écritures et sorties'], ['sortie', "Erreurs de l'appli"]] as [v, nom]}
+    <button type="button" aria-pressed={vue === v} onclick={() => { vue = v; lire() }}
+            class="h-8 rounded-full border px-3 text-sm text-muted-foreground aria-pressed:border-transparent aria-pressed:bg-secondary aria-pressed:text-foreground">{nom}</button>
+  {/each}
+</div>
+
 <div class="mb-4 flex flex-wrap items-center gap-2">
   <select bind:value={appli} onchange={lire} aria-label="Appli" class="h-9 rounded-lg border border-input bg-transparent px-2 text-sm">
     <option value="">Toutes les applis</option>
     {#each applis as a (a.id)}<option value={a.id}>{a.nom}</option>{/each}
   </select>
+  {#if vue === 'ecritures'}
   <select bind:value={sorte} onchange={lire} aria-label="Sorte" class="h-9 rounded-lg border border-input bg-transparent px-2 text-sm">
     <option value="">Tout</option>
     {#each Object.entries(SORTES) as [k, v]}<option value={k}>{v}</option>{/each}
   </select>
+  {/if}
   <Button variant="ghost" onclick={lire}><RefreshCw class="size-3.5" aria-hidden="true" />Relire</Button>
-  {#if j}
+  {#if j && vue === 'ecritures'}
     <span class="ml-auto text-sm text-muted-foreground">
       {j.compte.ecriture} écritures, {j.compte.sortie_refusee + j.compte.nom_refuse} sorties refusées
     </span>
   {/if}
 </div>
 
-{#if j}
+{#if vue === 'sortie'}
+  {#if !appli}
+    <p class="text-sm text-muted-foreground">Choisis une appli : tu verras la fin de son journal (erreurs comprises), de la plus ancienne à la plus récente ligne.</p>
+  {:else if sortie}
+    <p class="mb-2 text-sm text-muted-foreground">{sortie.erreurs} erreur{sortie.erreurs > 1 ? 's' : ''} Python dans le journal ({sortie.total} lignes) ; les {sortie.lignes.length} dernières :</p>
+    {#if sortie.lignes.length}
+      <pre class="max-h-[70vh] overflow-auto rounded-2xl border bg-card p-4 text-xs leading-relaxed whitespace-pre-wrap break-all">{sortie.lignes.join('\n')}</pre>
+    {:else}
+      <p class="text-sm text-muted-foreground">Journal vide : l'appli n'a encore rien écrit (ou n'a jamais été lancée).</p>
+    {/if}
+  {/if}
+{:else if j}
   {#if j.lignes.length}
     <div class="overflow-x-auto rounded-2xl border bg-card">
       <table class="w-full text-left text-sm">

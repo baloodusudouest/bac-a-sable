@@ -1,5 +1,13 @@
 # Journal des versions
 
+## 0.1.4 — 19/11/2026
+
+- **Journal › Erreurs de l'appli** : la fin du journal du processus de chaque appli simulée (erreurs Python
+  comprises), avec le nombre d'erreurs. Route `GET /api/applis/{appli}/sortie`.
+- Soirée : un téléphone en erreur dit maintenant quelle réponse Douze points a donnée et où lire la cause, au lieu du
+  message brut d'httpx. Origine : erreurs 500 de Douze points 1.6.2 vues par Julien sur le NAS (7 téléphones), pas
+  reproduites sur la machine de Claude (disque rapide).
+
 ## 0.1.3 — 19/11/2026
 
 - **Douze points 1.6.2 embarqué, avec un faux Immich** (remarque de Julien du 19/11/2026 : ni icône 📷 ni bandeau photo). Douze points n'affiche les photos que si Immich est réglé ; son lanceur (`lanceurs/douze_points.py`) lui donne maintenant le faux Immich de ses propres tests (`httpx.MockTransport`, rien ne sort du processus). L'icône 📷 et « Immortaliser » paraissent sur les téléphones ; chaque photo envoyée est notée au journal (« aurait écrit chez immich.bac-a-sable »). Douze points 1.6.1 et 1.6.2 viennent avec : points du public dans l'ordre du jury, prénoms des jumeaux en entier, jumeau toujours affiché.

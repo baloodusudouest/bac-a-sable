@@ -116,3 +116,16 @@ def test_journal_vide_puis_lu(client):
                       'pas du json\n')
     j = client.get("/api/journal").json()
     assert j["compte"]["ecriture"] == 1 and len(j["lignes"]) == 1
+
+
+def test_erreurs_de_l_appli_lisibles(client):
+    """0.1.4 : la fin du journal du processus simulé, avec le nombre d'erreurs Python."""
+    g = main.ETAT["gestionnaire"]
+    assert client.get("/api/applis/douze-points/sortie").json() == {"appli": "douze-points", "lignes": [], "total": 0, "erreurs": 0}
+    d = g.dossier("douze-points")
+    d.mkdir(parents=True)
+    (d / "sortie.log").write_text("démarrage\nERROR:    Exception in ASGI application\nTraceback (most recent call last):\n"
+                                  "sqlite3.OperationalError: database is locked\n", encoding="utf-8")
+    r = client.get("/api/applis/douze-points/sortie").json()
+    assert r["erreurs"] == 2 and r["lignes"][-1].endswith("database is locked")
+    assert client.get("/api/applis/inconnue/sortie").status_code == 404
