@@ -5,6 +5,7 @@ que le code.
 
 ## État (20/11/2026)
 
+- **0.3.0 (20/11/2026)** : toutes les applis embarquées aux versions du chantier « fiches Connexion » (voir CHANGELOG) ; socle 0.11.1.
 - **0.2.0** (20/11/2026) : écran « Connexion » commun (contrat 3, socle 0.11.0, `simule` vrai) avec une fiche, carnet
   (le seul vrai lien) ; Douze points 1.10.1 embarqué (commit b6830c9 ; soirée de bout en bout rejouée ici, verte).
   `ANNEAU_CLE` dans compose. Attention : le Bac à sable n'est pas sur le réseau de la stack, l'Anneau doit le lire par

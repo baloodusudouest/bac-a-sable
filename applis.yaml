@@ -24,8 +24,8 @@ applis:
   anneau:
     nom: L'Anneau
     depot: anneau
-    version: 0.14.0
-    sha: e4e7f87d6e3843e4ba9a69bce629613b35db30e9
+    version: 0.16.1
+    sha: f2a811486712e361b9d1111fcc7d5029198cdcbe
     port: 8110
     lanceur: demo
     module: tests.interface.serveur
@@ -38,8 +38,8 @@ applis:
   carnet:
     nom: carnet
     depot: carnet
-    version: 3.2.0
-    sha: b1ad3dd0bfb5dd6cdec130c8653c5d830f52f43c
+    version: 3.3.1
+    sha: b4ed56e4e4b50a38ff36211a116f905c3bb51b84
     port: 8111
     lanceur: bac
     mot_de_passe: essai-bac-a-sable
@@ -50,8 +50,8 @@ applis:
   chambre-noire:
     nom: Chambre noire
     depot: chambre-noire
-    version: 0.8.0
-    sha: 1cb43739c9e7b5006723e7b843c8df56b1b28ecf
+    version: 0.9.1
+    sha: 39434ab2d6368b5eacd2dca5448ad97d4a850190
     port: 8112
     lanceur: demo
     module: tools.demo
@@ -65,8 +65,8 @@ applis:
   comptoir:
     nom: Comptoir
     depot: comptoir
-    version: 0.7.0
-    sha: 54fcbb82fcca4146e7c86d5eaeadc9c2bd94ac89
+    version: 0.8.1
+    sha: 7ba6c47a1404bf97ea3baae249a0cccee184420a
     port: 8113
     lanceur: demo
     module: tools.demo
@@ -79,8 +79,8 @@ applis:
   douze-points:
     nom: Douze points
     depot: douze-points
-    version: 1.10.1
-    sha: b6830c9ac3c19c4521446ce2f8e777c5f9492bb4
+    version: 1.10.2
+    sha: d6529690353f4bc444c866491e28e9c906b4420f
     port: 8114
     lanceur: bac
     mot_de_passe: essai-bac-a-sable
@@ -91,8 +91,8 @@ applis:
   gazette:
     nom: Gazette
     depot: gazette
-    version: 0.27.0
-    sha: 769424879afa639df4fffdb05f0d7c5c79e9aac8
+    version: 0.29.1
+    sha: 27e96b5e6e33e31d5ec99f6ef061d8d8f8afa564
     port: 8115
     lanceur: demo
     module: tools.demo
@@ -105,8 +105,8 @@ applis:
   kit-urgence:
     nom: Kit d'urgence
     depot: kit-urgence
-    version: 2.6.1
-    sha: daf92e2b3521ae83185586a97eb82b10c716aa75
+    version: 2.7.1
+    sha: 3ff9e86906da59cc9e5a66db2a19128ba8e3a5fb
     port: 8116
     lanceur: demo
     module: tests.interface.serveur
@@ -120,8 +120,8 @@ applis:
   millesime:
     nom: Millésime
     depot: millesime
-    version: 2.14.0
-    sha: 4545eb27b37cb66f96a8e077133f47e359c3729b
+    version: 2.15.1
+    sha: 0bcd8da23ad2ecbd1fba2ab0fff88094ec5877a1
     port: 8117
     lanceur: demo
     module: tests.interface.serveur
@@ -134,8 +134,8 @@ applis:
   scriptorium:
     nom: Scriptorium
     depot: scriptorium
-    version: 0.7.0
-    sha: 19441664793f6062d08da5d63edf87ee45459b4f
+    version: 0.8.1
+    sha: fffd96e633f412b501c904d34274ed2ae20b56ec
     port: 8118
     lanceur: demo
     module: tools.demo
@@ -148,8 +148,8 @@ applis:
   sillage:
     nom: Sillage
     depot: sillage
-    version: 0.20.0
-    sha: d2304078d24c57c00c8cc5fc4ff7a8b11d3bb83c
+    version: 0.21.1
+    sha: 40ba814f75b016a29dc667391898e4b56d372502
     port: 8119
     lanceur: demo
     module: tests.interface.serveur
@@ -162,8 +162,8 @@ applis:
   transhumance:
     nom: Transhumance
     depot: transhumance
-    version: 0.8.0
-    sha: 1ce1a5aeab981d24daad387ff9147add664772ad
+    version: 0.9.2
+    sha: d3f6fd59d36366458746ebb6bfb2007beeb53501
     port: 8120
     lanceur: demo
     module: tests.interface.serveur
