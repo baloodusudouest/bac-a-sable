@@ -22,6 +22,7 @@ services:
       - TZ=Europe/Paris
       - MAISON_PASSWORD=${MAISON_PASSWORD}       # mot de passe commun (connexion au Bac à sable)
       - MAISON_JETON=${MAISON_JETON:-}           # jeton commun : sauvegarde des réglages par l'Anneau, copie depuis carnet
+      - ANNEAU_CLE=${ANNEAU_CLE:-}                         # contrat 3 : l'Anneau lit les fiches « Connexion » ; vide = porte fermée
       - BAC_CARNET_URL=${BAC_CARNET_URL:-}       # adresse de carnet vue depuis ce conteneur ; vide : pas de copie de vraies fiches
       - BAC_AUTOTEST=${BAC_AUTOTEST:-}           # adresses à essayer en plus à l'autotest (hôte:port, séparées par des virgules)
       - BAC_ARRET_MINUTES=${BAC_ARRET_MINUTES:-30}

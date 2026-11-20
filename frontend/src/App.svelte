@@ -1,6 +1,7 @@
 <script>
   // Navigation commune aux applis : rail à gauche sur PC, pilule d'icônes en bas sur iPhone.
-  // Entrées : Applis (écran de travail), Soirée (Douze points simulé), Personnes, Scénarios, Journal, Réglages.
+  // Entrées : Applis (écran de travail), Soirée (Douze points simulé), Personnes, Scénarios, Journal, Connexion
+  // (0.2.0 : écran commun des services, contrat 3), Réglages.
   import { onMount } from 'svelte'
   import { fly } from 'svelte/transition'
   import Boxes from '@lucide/svelte/icons/boxes'
@@ -9,6 +10,7 @@
   import Clapperboard from '@lucide/svelte/icons/clapperboard'
   import ScrollText from '@lucide/svelte/icons/scroll-text'
   import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal'
+  import Plug from '@lucide/svelte/icons/plug'
   import { api } from '$lib/api.js'
   import Filigrane from '$lib/Filigrane.svelte'
   import Connexion from './pages/Connexion.svelte'
@@ -18,6 +20,7 @@
   import Scenarios from './pages/Scenarios.svelte'
   import Journal from './pages/Journal.svelte'
   import Reglages from './pages/Reglages.svelte'
+  import Services from '$lib/services/Services.svelte'   // 0.2.0 : écran commun (contrat 3, socle 0.11.0)
 
   const onglets = [
     { page: 'applis', nom: 'Applis', icone: Boxes },
@@ -25,6 +28,7 @@
     { page: 'personnes', nom: 'Personnes', icone: Users },
     { page: 'scenarios', nom: 'Scénarios', icone: Clapperboard },
     { page: 'journal', nom: 'Journal', icone: ScrollText },
+    { page: 'connexion', nom: 'Connexion', icone: Plug },
     { page: 'reglages', nom: 'Réglages', icone: SlidersHorizontal },
   ]
 
@@ -101,6 +105,9 @@
             <Scenarios />
           {:else if page === 'journal'}
             <Journal />
+          {:else if page === 'connexion'}
+            <!-- vrais liens du Bac à sable, en lecture seule (aucun geste qui écrit) -->
+            <Services lectureSeule={true} ondeconnecte={() => (connecte = false)} />
           {:else if page === 'reglages'}
             <Reglages {session} {deconnecter} />
           {:else}

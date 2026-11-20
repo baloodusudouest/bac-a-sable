@@ -5,6 +5,10 @@ que le code.
 
 ## État (20/11/2026)
 
+- **0.2.0** (20/11/2026) : écran « Connexion » commun (contrat 3, socle 0.11.0, `simule` vrai) avec une fiche, carnet
+  (le seul vrai lien) ; Douze points 1.10.1 embarqué (commit b6830c9 ; soirée de bout en bout rejouée ici, verte).
+  `ANNEAU_CLE` dans compose. Attention : le Bac à sable n'est pas sur le réseau de la stack, l'Anneau doit le lire par
+  l'adresse du NAS (port 8104). Jamais essayé sur la vraie installation.
 - **0.1.6** (20/11/2026) : Douze points 1.7.1 (erreurs 500 « database is locked » corrigées) ; garde : `_taille()`
   lit `content-length` au lieu du corps (un envoi en flux vers un faux service échouait). Jamais essayé sur la vraie
   installation.

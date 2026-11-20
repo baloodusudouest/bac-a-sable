@@ -4,7 +4,8 @@
 Routes : /health (publique), /api/session, /api/connexion, /api/deconnexion,
 /api/applis (état, démarrer, arrêter, vider), /api/personnes (inventer, pièges, copier depuis carnet, épingler,
 effacer), /api/scenarios (créer, jouer, effacer), /api/douze (soirée simulée, téléphones), /api/journal,
-/api/autotest, /api/reglages, /api/synthese, /externe/sauvegarde (jeton commun, pour l'Anneau), puis l'interface.
+/api/autotest, /api/reglages, /api/synthese, /api/maison/services (fiches « Connexion », contrat 3),
+/externe/sauvegarde (jeton commun, pour l'Anneau), puis l'interface.
 Les applis simulées sont servies par le relais, chacune sur son port (app/relais.py).
 """
 from __future__ import annotations
@@ -129,6 +130,30 @@ async def garde(request: Request, appel):
     if chemin.startswith(("/api/", "/externe/")):
         reponse.headers["Cache-Control"] = "no-store"
     return reponse
+
+
+# ================================================================ fiches « Connexion » (0.2.0, contrat 3, socle 0.11.0)
+# GET /api/maison/services et POST /api/maison/services/{id}/verifier (session ou ANNEAU_CLE) : écran commun
+# $lib/services/Services.svelte, et fiche « État » de l'Anneau (bandeau « Simulé » : simule=True).
+# Une fiche par VRAI lien du Bac à sable : carnet seulement (copie de vraies fiches). Les applis embarquées
+# (Douze points, carnet simulé…) ne joignent que des faux services, elles n'ont pas de fiche ici.
+# Essai léger : relire la liste des fiches de carnet (lecture, rien n'est gardé ni écrit).
+
+def _essai_carnet():
+    fiches = personnes.lire_carnet(cfg().carnet_url, cfg().carnet_jeton, ETAT.get("transport_carnet"))
+    return True, f"{len(fiches)} fiches lisibles."
+
+
+SERVICES = maison.Services(APPLI, simule=True)
+SERVICES.ajouter(
+    "carnet", "carnet", genre="maison", cible="carnet",
+    lit="Les vraies fiches de carnet (nom, prénom, naissance, genre), en lecture seule, pour en copier quelques-unes "
+        "dans les personnes du Bac à sable. Le Bac à sable lui-même peut joindre carnet, sans jamais transmettre cet "
+        "accès aux applis simulées.",
+    ecrit="Rien.", regle=lambda: bool(cfg().carnet_url and cfg().carnet_jeton),
+    reglage="BAC_CARNET_URL et MAISON_JETON", essai=_essai_carnet)
+# Monté APRÈS la garde : le dernier middleware ajouté passe en premier.
+maison.monter_services(app, SERVICES, lambda r: "sessions" in ETAT and ETAT["sessions"].connecte(r.cookies))
 
 
 def adresse_appli(request: Request, ident: str) -> str:

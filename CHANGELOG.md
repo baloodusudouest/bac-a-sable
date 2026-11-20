@@ -1,5 +1,27 @@
 # Journal des versions
 
+## 0.2.0 — 20/11/2026 (fiches « Connexion » communes, contrat 3, et Douze points 1.10.1)
+
+- **Écran « Connexion »** (choix de Julien) : nouvelle entrée de la navigation, entre Journal et Réglages, avec l'écran
+  commun `$lib/services/Services.svelte` (socle 0.11.0, copie non retouchée, empreinte contrôlée). Routes
+  `GET /api/maison/services` et `POST /api/maison/services/{id}/verifier` (session du Bac à sable ou `ANNEAU_CLE`),
+  réponse `"simule": true` : l'Anneau met un bandeau « Simulé » sur ses fiches.
+- **Une fiche, carnet** : le seul vrai lien du Bac à sable (copie de vraies fiches, `BAC_CARNET_URL` et
+  `MAISON_JETON`), en lecture seule, sans geste. « Vérifier » relit la liste des fiches (un GET, rien n'est gardé).
+  Les applis embarquées (Douze points, carnet simulé…) ne joignent que des faux services : pas de fiche pour elles.
+  L'écran du mot de passe (`pages/Connexion.svelte`) ne change pas ; aucune ancienne route à retirer (il n'y avait pas
+  d'écran des services ; « Copie depuis carnet : réglée » reste aussi dans Réglages).
+- `app/maison.py` passe au contrat 3 (socle 0.11.0). `ANNEAU_CLE` ajoutée dans `docker-compose.yml` et `.env.example`.
+- **Douze points 1.10.1** embarqué (avant : 1.7.1) : 1.8.0 (public sans cliquer, pays en lice, selfies des duos à la
+  télé, saisie directe de la grille), 1.9.0 (dévoilement réglable, À traiter et clôture, résultat officiel pour
+  Gazette, photo apéro, mode d'emploi), 1.10.0 et 1.10.1 (fiches « Connexion » communes). Seuls `applis.yaml`
+  (version, commit b6830c9) et le Dockerfile refait par `tools/dockerfile.py` changent ; le lanceur et la régie de la
+  soirée restent les mêmes (réglages et API de Douze points inchangés pour eux).
+- Tests : `tests/test_fiches_connexion.py` (forme du contrat 3, `simule` vrai, accès session ou `ANNEAU_CLE` seulement,
+  Vérifier d'un service pas relié, copies communes non retouchées, essai de carnet en lecture seule). Bout en bout
+  rejoué ici avec Douze points 1.10.1 (soirée complète, 4 téléphones, relais, cookies) : vert.
+- **Jamais essayé sur la vraie installation.**
+
 ## 0.1.6 — 20/11/2026
 
 - **Douze points 1.7.1** embarqué : plus d'erreurs 500 « database is locked » quand plusieurs téléphones notent en même

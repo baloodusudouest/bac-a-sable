@@ -65,10 +65,10 @@ COPY --from=py-comptoir /src /build
 WORKDIR /build/frontend
 RUN npm ci --no-audit --no-fund && npx vite build --outDir /out --emptyOutDir
 
-# ---------- Douze points 1.7.1 (douze-points @ 32bbcc7) ----------
+# ---------- Douze points 1.10.1 (douze-points @ b6830c9) ----------
 FROM python:3.12-slim-bookworm AS py-douze-points
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev && rm -rf /var/lib/apt/lists/*
-ADD --keep-git-dir=false https://github.com/baloodusudouest/douze-points.git#32bbcc77d864ea04888e05e6b908e5b2c19818f7 /src
+ADD --keep-git-dir=false https://github.com/baloodusudouest/douze-points.git#b6830c9ac3c19c4521446ce2f8e777c5f9492bb4 /src
 RUN pip install --no-cache-dir --target /site -r /src/requirements.txt && rm -rf /src/.github
 FROM node:22-bookworm-slim AS ui-douze-points
 COPY --from=py-douze-points /src /build
