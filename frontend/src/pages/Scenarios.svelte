@@ -1,7 +1,7 @@
 <script>
-  // Scénarios : des personnes + des applis (+ réglages propres à Douze points). « Jouer » remet l'appli à zéro,
-  // y verse le scénario (carnet, Douze points) et l'ouvre. Les autres applis s'ouvrent sur leurs données de
-  // démonstration.
+  // Scénarios : des personnes + des applis (+ réglages propres à Douze points). 0.4.0 : « Jouer » remet toute la
+  // maison simulée à zéro, y verse le scénario (carnet, Douze points, Gazette : les applis branchées) et ouvre l'appli
+  // avec celles qu'elle lit. Les applis encore en démo s'ouvrent sur les données de démonstration de leur dépôt.
   import { onMount } from 'svelte'
   import { api } from '$lib/api.js'
   import { Button } from '$lib/components/ui/button/index.js'
@@ -18,7 +18,7 @@
   let joue = $state('')             // « sid:appli » en cours
   let reglages = $state({ douze_telephones: 6, douze_chansons: 12 })
 
-  const vide = () => ({ nom: '', applis: [], personnes: [], telephones: 6, chansons: 12 })
+  const vide = () => ({ nom: '', applis: [], personnes: [], telephones: 6, chansons: 12, pays: '', cloturee: false })
   let nouveau = $state(vide())
 
   const nomAppli = (id) => applis.find((a) => a.id === id)?.nom ?? id
@@ -43,7 +43,10 @@
     message = ''
     const corps = { nom: nouveau.nom, applis: nouveau.applis, personnes: nouveau.personnes, reglages: {} }
     if (nouveau.applis.includes('douze-points'))
-      corps.reglages['douze-points'] = { telephones: Number(nouveau.telephones), chansons: Number(nouveau.chansons) }
+      corps.reglages['douze-points'] = {
+        telephones: Number(nouveau.telephones), chansons: Number(nouveau.chansons), cloturee: !!nouveau.cloturee,
+        ...(nouveau.pays.trim() ? { pays: nouveau.pays.split(',').map((x) => x.trim()).filter(Boolean) } : {}),
+      }
     try {
       await api.post('/api/scenarios', corps)
       nouveau = { ...vide(), telephones: reglages.douze_telephones, chansons: reglages.douze_chansons }
@@ -62,8 +65,9 @@
       const r = await api.post(`/api/scenarios/${s.id}/jouer`, { appli })
       if (appli === 'douze-points') location.hash = '#/soiree'
       else if (onglet) onglet.location = r.adresse
-      message = r.versees ? `${nomAppli(appli)} relancée avec ${r.personnes} personnes.`
-                          : `${nomAppli(appli)} relancée sur ses données de démonstration (elle ne reçoit pas encore les personnes).`
+      const ouvertes = (r.ouvertes || []).join(', ')
+      message = r.versees ? `Maison remise à zéro ; ${r.personnes} personnes versées. Lancées : ${ouvertes}.`
+                          : `Maison remise à zéro. ${nomAppli(appli)} est encore en démo : elle s'ouvre sur les données de son dépôt.`
     } catch (err) {
       onglet?.close()
       message = err.message
@@ -83,7 +87,8 @@
 <header class="mb-6">
   <h1 class="titre">Scénarios</h1>
   <p class="mt-1 max-w-prose text-sm text-muted-foreground">
-    Jouer un scénario remet l'appli à zéro et la relance avec ses personnes. Rejouer, c'est repartir du même point.
+    Jouer un scénario remet toute la maison simulée à zéro et y verse ses personnes : carnet, Douze points et la Gazette
+    se parlent comme dans la vraie maison. Rejouer, c'est repartir du même point.
   </p>
 </header>
 
@@ -132,6 +137,14 @@
       <label class="flex flex-col gap-1 text-sm">Chansons
         <input type="number" min="1" max="26" bind:value={nouveau.chansons} class="h-9 w-24 rounded-lg border border-input bg-transparent px-3" />
       </label>
+      <label class="flex min-w-60 flex-1 flex-col gap-1 text-sm">Pays (facultatif, séparés par des virgules)
+        <input bind:value={nouveau.pays} placeholder="Portugal, Pologne, Moldavie…" maxlength="400"
+               class="h-9 rounded-lg border border-input bg-transparent px-3" />
+      </label>
+      <label class="flex basis-full items-center gap-2 text-sm">
+        <input type="checkbox" bind:checked={nouveau.cloturee} class="size-4 accent-[var(--primary)]" />
+        Soirée déjà clôturée (jouée jusqu'au bout : carnet la reçoit, la Gazette peut en faire son numéro)
+      </label>
       <p class="basis-full text-xs text-muted-foreground">Les invités sans téléphone simulé restent libres pour de vrais iPhone.</p>
     </fieldset>
   {/if}
@@ -147,7 +160,7 @@
         <div class="min-w-0 flex-1">
           <h2 class="truncate text-base font-medium">{s.nom}</h2>
           <p class="text-xs text-muted-foreground">
-            {s.personnes.length} personnes{s.joue_le ? `, joué le ${new Date(s.joue_le).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}` : ', jamais joué'}
+            {s.personnes.length} personnes{s.reglages?.['douze-points']?.cloturee ? ', soirée déjà clôturée' : ''}{s.joue_le ? `, joué le ${new Date(s.joue_le).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}` : ', jamais joué'}
           </p>
         </div>
         <button type="button" aria-pressed={s.epingle} aria-label={s.epingle ? 'Désépingler' : 'Épingler (ses copies de vraies fiches ne sont pas effacées)'}
@@ -160,7 +173,7 @@
         {#each s.applis as a, i}
           <Button variant={i === 0 ? 'default' : 'outline'} onclick={() => jouer(s, a)} disabled={!!joue}>
             {#if joue === `${s.id}:${a}`}<LoaderCircle class="size-3.5 animate-spin" aria-hidden="true" />{:else}<Play class="size-3.5" aria-hidden="true" />{/if}
-            Jouer sur {nomAppli(a)}{versees(a) ? '' : ' (démo)'}
+            Jouer sur {nomAppli(a)}{versees(a) ? '' : ' (encore en démo)'}
           </Button>
         {/each}
       </div>

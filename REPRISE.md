@@ -5,6 +5,16 @@ que le code.
 
 ## État (20/11/2026)
 
+- **0.4.0 (20/11/2026) « la maison branchée »** : liens entre applis simulées (table `liens:` d'`applis.yaml`, copie
+  figée `docs/flux-maison.json`), jeton simulé, faux annuaire de l'Anneau (127.0.0.1:9104), garde par appli, cascade,
+  activité propagée, limite de mémoire de toute la maison (2,4 Go), remise à zéro de la maison avec verrou, lanceur de
+  la Gazette (carnet et Douze points simulés, personnes inventées seulement), Chromium de la Gazette restreint (proxy
+  mort, `<-loopback>`), badge « encore en démo ». Test de livraison vert ici (soirée Portugal, Pologne, Moldavie…
+  clôturée → numéro de la Gazette avec ces pays, les invités inventés, leurs commentaires ; aucune copie de vraie
+  fiche) ; écrans PC et iPhone vérifiés (aucune erreur de page, aucun débordement). Dossier `docs/ajout-0.4.0.md`,
+  conseil `docs/conseil-0.4.0.md`. **Jamais essayé sur la vraie installation** : ni la cascade ni la limite de mémoire
+  sur le NAS (mesure réelle de Chromium), ni un vrai iPhone sur la soirée clôturée, ni la copie de vraies fiches suivie
+  jusqu'à la Gazette avec le vrai carnet.
 - **0.3.3 (20/11/2026)** : Douze points 1.11.0 embarqué.
 - **0.3.2 (20/11/2026)** : Douze points 1.10.3 embarqué.
 - **0.3.1 (20/11/2026)** : Millésime 2.16.0 embarqué.
@@ -44,8 +54,13 @@ que le code.
 
 1. Paquet ghcr `bac-a-sable` : le rendre public si Portainer ne peut pas le tirer (paquet neuf, privé par défaut).
 2. Installer sur le NAS (stack), lancer l'autotest avec `BAC_AUTOTEST` (adresses réelles de la maison).
-3. Verser les personnes du scénario dans d'autres applis (Gazette, Sillage, Kit d'urgence) : un lanceur par appli
-   dans `lanceurs/`, sur le modèle de `lanceurs/carnet.py`.
+3. **0.4.1** : faux Immich commun (service à part sous la garde, son journal, tests de contrat rejouant les faux Immich
+   des dépôts) ; ajouter son port à `ports_permis` ; les photos des duos de Douze points arrivent alors dans la Gazette.
+4. **0.4.x** : un lanceur par appli restante (Sillage, Millésime, Chambre noire, Kit, Comptoir, Scriptorium,
+   Transhumance, Éphéméride) ; chaque nouveau lanceur branche ses liens (rien d'autre à changer : `liens:` les porte
+   déjà, la variable devient obligatoire dans son lanceur).
+5. **0.5.0** : page « Liens », voyants verts des fiches « Connexion » entre applis simulées, instantanés nommés,
+   répétition générale.
 
 ## Décisions tranchées
 
@@ -54,11 +69,22 @@ que le code.
 - Une seule appli commune, aucune appli en service modifiée (seule exception : lien dans les Réglages de l'Anneau).
 - Applis lancées depuis les lanceurs de démonstration de leurs dépôts (ils coupent les tâches de fond et branchent
   les faux services) ; lanceurs écrits ici pour carnet (personnes du scénario) et Douze points (pas de démo).
+- 0.4.0 : lanceur écrit ici pour la Gazette ; copies de vraies fiches jamais montrées à la Gazette simulée (arbitrage
+  de Julien, liste blanche) ; Chromium restreint par ses propres réglages de proxy (choix fait en codant) ; une seule
+  remise à zéro pour toute la maison ; faux Immich commun reporté à la 0.4.1 (conseil).
 - Un environnement Python par appli (`/applis/<appli>/site`) : leurs versions épinglées se contredisent.
 - Anneau simulé sans connexion : le relais tient les sessions, jamais le navigateur.
 - Millésime sur ses faux services (âges inventés) : on teste les écrans, pas la datation.
 
 ## Pièges
+
+- 0.4.0 : une appli simulée qui doit joindre une autre passe par un **lien branché** (`liens:`) ; sinon la garde
+  refuse le port (journal : « sortie refusée 127.0.0.1:<port> »). Les adresses de l'annuaire sont celles du relais
+  vues par le navigateur : une appli qui s'en servirait côté serveur est refusée (normal).
+- 0.4.0 : la Gazette simulée ne voit que les fiches « BAS-<id> » des personnes inventées ou pièges du scénario : sans
+  scénario joué, elle est vide (exprès). Un invité de Douze points ajouté à la main (prénom tapé, pas de fiche de
+  carnet) n'apparaît pas dans la Gazette.
+- 0.4.0 : `BAC_MAX_SIMULTANEES` n'existe plus (remplacé par `BAC_MEMOIRE_MO`).
 
 - Pas de https : « Invalid HTTP request received » dans le journal = un navigateur (ou l'adresse Tailscale en
   `https://`) qui parle https au port 8104 ou 8110-8121.

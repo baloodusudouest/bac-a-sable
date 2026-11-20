@@ -14,6 +14,7 @@ import pytest
 from app import main
 
 pytestmark = pytest.mark.skipif(not os.environ.get("BAC_ESSAI_APPLIS"), reason="applis embarquées absentes")
+ANNUAIRE = True       # 0.4.0 : le faux annuaire de l'Anneau écoute (conftest)
 
 
 def installee(ident: str) -> bool:

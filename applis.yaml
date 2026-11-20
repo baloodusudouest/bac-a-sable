@@ -18,7 +18,11 @@
 #   site        dossier site-packages dans l'image de l'appli
 #   static      dossier de l'interface bâtie dans l'image de l'appli
 #   personnes   « oui » si le scénario y verse des personnes (sinon : données de démonstration du dépôt)
-#   memoire     mémoire maximale, en Mo (le processus est arrêté au-delà)
+#   memoire     repère de mémoire, en Mo (affiché ; 0.4.0 : seule la limite commune de toute la maison arrête une appli)
+#
+# 0.4.0 : une appli au lanceur « bac » est « branchée » (elle prend ses données dans le scénario et dans les autres
+# applis simulées) ; une appli au lanceur « demo » est « encore en démo » (données inventées de son dépôt) et ses liens
+# restent coupés, pour ne pas mêler démo et scénario.
 
 applis:
   anneau:
@@ -94,13 +98,11 @@ applis:
     version: 0.29.1
     sha: 27e96b5e6e33e31d5ec99f6ef061d8d8f8afa564
     port: 8115
-    lanceur: demo
-    module: tools.demo
-    args: ["{port}"]
-    mot_de_passe: demo-demo-demo
+    lanceur: bac
+    mot_de_passe: essai-bac-a-sable
     site: /usr/local/lib/python3.12/site-packages
     static: /app/app/static
-    personnes: non
+    personnes: oui
     memoire: 800
   kit-urgence:
     nom: Kit d'urgence
@@ -187,3 +189,46 @@ applis:
     static: /srv/app/static
     personnes: non
     memoire: 400
+
+# 0.4.0 — liens entre applis simulées, recopiés des flux du coffre (docs/flux-maison.json en est la copie figée ; un
+# test vérifie que les deux disent la même chose). Une ligne par flux :
+#   de, vers, nature  le flux tel que le coffre l'écrit (sens des données)
+#   appelant          l'appli qui ouvre la connexion (celle qui lit, ou celle qui écrit)
+#   variable          sa variable d'adresse dans la vraie stack ; dans le Bac à sable elle vaut
+#                     http://127.0.0.1:<port local de l'autre appli>, et seulement si les deux applis sont branchées
+#   portee            « simule » (défaut), « annuaire » (simulé par le faux annuaire de l'Anneau, MAISON_ANNEAU_URL),
+#                     « hors » (tuiles, cookie commun, sauvegarde de nuit : hors du Bac à sable), « main » (fait à la main)
+#   moyen             autre chose qu'une adresse http (« fichier ») : pas simulé en 0.4.0
+liens:
+  - {de: anneau, vers: carnet, nature: donnees, portee: annuaire}
+  - {de: anneau, vers: gazette, nature: cookie, portee: hors}
+  - {de: anneau, vers: kit-urgence, nature: cookie, portee: hors}
+  - {de: anneau, vers: millesime, nature: cookie, portee: hors}
+  - {de: anneau, vers: sillage, nature: cookie, portee: hors}
+  - {de: anneau, vers: transhumance, nature: cookie, portee: hors}
+  - {de: anneau, vers: ephemeride, nature: cookie, portee: hors}
+  - {de: carnet, vers: anneau, nature: donnees, portee: hors}
+  - {de: comptoir, vers: anneau, nature: donnees, portee: hors}
+  - {de: douze-points, vers: anneau, nature: donnees, portee: hors}
+  - {de: gazette, vers: anneau, nature: donnees, portee: hors}
+  - {de: kit-urgence, vers: anneau, nature: donnees, portee: hors}
+  - {de: millesime, vers: anneau, nature: donnees, portee: hors}
+  - {de: scriptorium, vers: anneau, nature: donnees, portee: hors}
+  - {de: sillage, vers: anneau, nature: donnees, portee: hors}
+  - {de: transhumance, vers: anneau, nature: donnees, portee: hors}
+  - {de: ephemeride, vers: anneau, nature: donnees, portee: hors}
+  - {de: carnet, vers: douze-points, nature: donnees, appelant: douze-points, variable: DOUZE_POINTS_CARNET_URL}
+  - {de: carnet, vers: gazette, nature: donnees, appelant: gazette, variable: GAZETTE_CARNET_URL}
+  - {de: carnet, vers: kit-urgence, nature: donnees, appelant: carnet, variable: KIT_URL, moyen: fichier}
+  - {de: carnet, vers: sillage, nature: donnees, appelant: sillage, variable: SILLAGE_CARNET_URL}
+  - {de: chambre-noire, vers: millesime, nature: donnees, appelant: millesime}
+  - {de: chambre-noire, vers: sillage, nature: donnees, appelant: sillage}
+  - {de: douze-points, vers: carnet, nature: donnees, appelant: douze-points, variable: DOUZE_POINTS_CARNET_URL}
+  - {de: douze-points, vers: gazette, nature: donnees, appelant: gazette, variable: GAZETTE_DOUZE_POINTS_URL}
+  - {de: gazette, vers: carnet, nature: donnees, appelant: gazette, variable: GAZETTE_CARNET_URL}
+  - {de: millesime, vers: carnet, nature: donnees, appelant: carnet, variable: CARNET_MILLESIME_URL}
+  - {de: millesime, vers: transhumance, nature: commande, appelant: millesime}
+  - {de: scriptorium, vers: comptoir, nature: donnees, portee: main}
+  - {de: sillage, vers: carnet, nature: donnees, appelant: carnet, variable: CARNET_SILLAGE_URL}
+  - {de: sillage, vers: gazette, nature: donnees, appelant: gazette, variable: GAZETTE_SILLAGE_URL}
+  - {de: sillage, vers: millesime, nature: donnees, appelant: millesime, variable: MILLESIME_SILLAGE_URL}

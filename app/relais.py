@@ -22,10 +22,11 @@ from urllib.parse import urlsplit
 
 import httpx
 from starlette.requests import Request
-from starlette.responses import HTMLResponse, Response, StreamingResponse
+from starlette.responses import HTMLResponse, JSONResponse, Response, StreamingResponse
 from starlette.websockets import WebSocket
 
 from . import filigrane
+from .processus import MESSAGE_MEMOIRE, REMISE_EN_COURS
 
 journal = logging.getLogger("bac-a-sable.relais")
 
@@ -115,15 +116,40 @@ class Relais:
                 f'à la même adresse, puis reviens ici.</p>', status_code=401)
         if self.g.bloque:
             return HTMLResponse(f"<p>{self.g.bloque}</p>", status_code=503)
-        if not self.g.etats[self.ident].vivant():
+        if self.g.remise:
+            return self.page_attente(REMISE_EN_COURS)
+        e = self.g.etats[self.ident]
+        if not e.vivant():
+            # 0.4.0 : arrêtée pour libérer la mémoire : elle le dit, et on la rouvre d'un geste (pas tout seul, sinon
+            # deux onglets ouverts se chasseraient l'un l'autre de la mémoire)
+            if e.arret_memoire and "bac-rouvrir" not in request.query_params:
+                return self.page_memoire(request)
             try:
                 adresse = f"{request.url.scheme}://{request.headers.get('host', '')}"
-                await self.g.demarrer(self.ident, adresse_publique=adresse)
+                await self.g.ouvrir(self.ident, adresse_publique=adresse)
                 self.session = {}
             except RuntimeError as exc:
                 return HTMLResponse(f"<p>{exc}</p>", status_code=503)
         self.g.toucher(self.ident)
         return None
+
+    def page_attente(self, message: str) -> Response:
+        return HTMLResponse(
+            f'<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width">'
+            f'<meta http-equiv="refresh" content="3"><body style="background:#151311;color:#f2ece2;font:16px system-ui;'
+            f'padding:2rem"><p>{message}</p>', status_code=503)
+
+    def page_memoire(self, request: Request) -> Response:
+        """0.4.0 : « arrêtée pour libérer la mémoire ; ses données sont gardées ; la rouvrir »."""
+        if not request.url.path.startswith("/api/") and request.method == "GET":
+            lien = f"{request.url.path}?bac-rouvrir=1"
+            return HTMLResponse(
+                f'<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width">'
+                f'<body style="background:#151311;color:#f2ece2;font:16px system-ui;padding:2rem;max-width:36rem">'
+                f'<p id="bac-a-sable-memoire">{self.appli.nom} a été arrêtée pour libérer la mémoire ; ses données '
+                f'sont gardées.</p><p><a style="color:#5cc6d6" href="{lien}">La rouvrir</a></p>', status_code=503)
+        return JSONResponse({"detail": f"{self.appli.nom} {MESSAGE_MEMOIRE}.", "arret_memoire": True},
+                            status_code=503)
 
     async def http(self, request: Request) -> Response:
         refus = await self.preparer(request)

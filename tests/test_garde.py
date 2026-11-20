@@ -12,9 +12,9 @@ from pathlib import Path
 GARDE = Path(__file__).resolve().parent.parent / "garde"
 
 
-def lancer(code: str, journal: Path, *args) -> subprocess.CompletedProcess:
+def lancer(code: str, journal: Path, *args, ports: str = "") -> subprocess.CompletedProcess:
     env = {"PATH": os.environ["PATH"], "PYTHONPATH": os.pathsep.join([str(GARDE), *sys.path[1:]]),
-           "BAS_APPLI": "essai", "BAS_JOURNAL": str(journal)}
+           "BAS_APPLI": "essai", "BAS_JOURNAL": str(journal), "BAS_PORTS": ports}
     return subprocess.run([sys.executable, "-c", code, *args], env=env, capture_output=True, text=True, timeout=60)
 
 
@@ -82,7 +82,7 @@ def test_machine_locale_permise_et_ecritures_notees(tmp_path):
             "t = httpx.MockTransport(lambda r: httpx.Response(200))\n"
             "httpx.Client(transport=t).post('http://immich/api/albums', json={'a': 1})\n"
             "httpx.Client(transport=t).get('http://immich/api/people')\n")
-    r = lancer(code, j, str(serveur.server_port))
+    r = lancer(code, j, str(serveur.server_port), ports=str(serveur.server_port))   # 0.4.0 : un port de ses liens
     serveur.shutdown()
     assert r.stdout.strip() == "204", r.stdout + r.stderr
     ecritures = [x for x in lignes(j) if x["sorte"] == "ecriture"]
@@ -109,3 +109,67 @@ def test_envoi_en_flux_vers_un_faux_service(tmp_path):
     assert r.stdout.split() == ["1500", "201"], r.stdout + r.stderr
     tailles = [x.get("taille") for x in lignes(j) if x["sorte"] == "ecriture"]
     assert tailles[-1] == 42 and len(tailles) == 2
+
+
+def _serveur_local():
+    class Rep(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"ok")
+
+        def log_message(self, *a):
+            pass
+    serveur = HTTPServer(("127.0.0.1", 0), Rep)
+    threading.Thread(target=serveur.serve_forever, daemon=True).start()
+    return serveur
+
+
+def test_garde_par_appli_refuse_un_port_local_hors_des_liens(tmp_path):
+    """0.4.0 (garde resserrée) : sur la machine elle-même, seuls les ports des liens de l'appli passent. Un autre port
+    local (le Bac à sable, une appli simulée sans lien, un relais) est refusé et noté."""
+    lie, autre = _serveur_local(), _serveur_local()
+    j = tmp_path / "j.jsonl"
+    code = ("import sys, httpx\n"
+            "for port in sys.argv[1:]:\n"
+            "    try:\n"
+            "        print(httpx.get(f'http://127.0.0.1:{port}/', timeout=3).text)\n"
+            "    except Exception as e:\n"
+            "        print('REFUS', 'Bac à sable' in str(e) or 'Bac à sable' in repr(e.__context__))\n")
+    r = lancer(code, j, str(lie.server_port), str(autre.server_port), ports=f"{lie.server_port},9104")
+    lie.shutdown()
+    autre.shutdown()
+    assert r.stdout.split() == ["ok", "REFUS", "True"], r.stdout + r.stderr
+    refus = [x for x in lignes(j) if x["sorte"] == "sortie_refusee"]
+    assert refus and refus[0]["vers"] == f"127.0.0.1:{autre.server_port}"
+
+
+def test_garde_laisse_les_serveurs_ouverts_par_l_appli_elle_meme(tmp_path):
+    """Les faux serveurs d'une démonstration (Millésime : ThreadingHTTPServer sur un port tiré au hasard) restent
+    joignables : le port ouvert par le processus lui-même est permis."""
+    j = tmp_path / "j.jsonl"
+    code = ("import threading, urllib.request\n"
+            "from http.server import HTTPServer, BaseHTTPRequestHandler\n"
+            "class R(BaseHTTPRequestHandler):\n"
+            "    def do_GET(self):\n"
+            "        self.send_response(200); self.end_headers(); self.wfile.write(b'dedans')\n"
+            "    def log_message(self, *a): pass\n"
+            "s = HTTPServer(('127.0.0.1', 0), R)\n"
+            "threading.Thread(target=s.serve_forever, daemon=True).start()\n"
+            "print(urllib.request.urlopen(f'http://127.0.0.1:{s.server_port}/').read().decode())\n")
+    r = lancer(code, j)
+    assert r.stdout.split() == ["dedans"], r.stdout + r.stderr
+
+
+def test_garde_refuse_les_adresses_de_la_vraie_stack(tmp_path):
+    """Les noms de la vraie stack (carnet:8096, douze-points:8088, anneau:8094) ne sont jamais résolus."""
+    j = tmp_path / "j.jsonl"
+    code = ("import httpx\n"
+            "for u in ('http://carnet:8096/gazette/personnes', 'http://douze-points:8088/externe/soirees', 'http://anneau:8094/externe/services'):\n"
+            "    try:\n"
+            "        httpx.get(u, timeout=2, trust_env=False); print('PASSE')\n"
+            "    except Exception:\n"
+            "        print('REFUS')\n")
+    r = lancer(code, j, ports="9111,9114")
+    assert r.stdout.split() == ["REFUS"] * 3, r.stdout + r.stderr
+    assert {x["nom"] for x in lignes(j) if x["sorte"] == "nom_refuse"} == {"carnet", "douze-points", "anneau"}

@@ -59,6 +59,11 @@ jobs:
           test "$(curl -s http://127.0.0.1:8104/health | python3 -c 'import sys,json;print(json.load(sys.stdin)["coupure"])')" = True
           test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8104/)" = 200
           test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8114/api/soirees)" = 401
+          # 0.4.0 : carnet simulé (copies de vraies fiches) et la Gazette restent derrière la connexion du relais
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8111/gazette/personnes)" = 401
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8115/api/eurovisions)" = 401
+          # le faux annuaire de l'Anneau n'est pas publié
+          if curl -s -m 3 http://127.0.0.1:9104/health; then echo "faux annuaire joignable de dehors"; exit 1; fi
       - uses: docker/build-push-action@v6
         with:
           context: .

@@ -30,7 +30,10 @@ class Config:
     carnet_jeton: str = ""
     attente_connexion: bool = True              # délai anti-essais ; coupé dans les tests
     arret_minutes: int = 30                     # une appli sans requête depuis ce délai est arrêtée
-    max_simultanees: int = 4                    # applis lancées en même temps, au plus
+    memoire_limite_mo: int = 2400               # 0.4.0 : limite de toute la maison (le conteneur est coupé net à 3 Go)
+    navigateurs: str = "/ms-playwright"         # Chromium de la Gazette (PLAYWRIGHT_BROWSERS_PATH des applis)
+    port_annuaire: int = 9104                   # 0.4.0 : faux annuaire de l'Anneau, en 127.0.0.1 seulement
+    annuaire: bool = True                       # écouter le faux annuaire ; coupé dans les tests d'API
     duree_copies_jours: int = 30                # copies de vraies fiches effacées après ce délai, sauf épinglées
     autotest: bool = True                       # coupé dans les tests (pas de réseau)
     relais: bool = True                         # écouter sur les ports des applis ; coupé dans les tests d'API
@@ -55,6 +58,7 @@ def charger() -> Config:
         carnet_url=os.environ.get("BAC_CARNET_URL", "").strip().rstrip("/"),
         carnet_jeton=maison.jeton_a_envoyer(),
         arret_minutes=int(os.environ.get("BAC_ARRET_MINUTES", "30") or 30),
-        max_simultanees=int(os.environ.get("BAC_MAX_SIMULTANEES", "4") or 4),
+        memoire_limite_mo=int(os.environ.get("BAC_MEMOIRE_MO", "2400") or 2400),
+        navigateurs=os.environ.get("PLAYWRIGHT_BROWSERS_PATH", "/ms-playwright") or "/ms-playwright",
         hotes_autotest=hotes,
     )

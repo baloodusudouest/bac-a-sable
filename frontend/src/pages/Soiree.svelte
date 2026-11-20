@@ -1,6 +1,8 @@
 <script>
   // Soirée Douze points simulée : téléphones automatiques, mur de téléphones (l'écran invité réel de chacun),
   // QR code pour rejoindre avec un vrai iPhone sur un prénom resté libre. La soirée se monte depuis Scénarios.
+  // 0.4.0 : « Clôturer la soirée » la joue jusqu'au bout (dévoilement, fin, clôture) : carnet simulé la reçoit et la
+  // Gazette simulée peut en faire son numéro.
   import { onMount, onDestroy } from 'svelte'
   import { api } from '$lib/api.js'
   import { Button } from '$lib/components/ui/button/index.js'
@@ -9,6 +11,8 @@
   import Square from '@lucide/svelte/icons/square'
   import ExternalLink from '@lucide/svelte/icons/external-link'
   import Smartphone from '@lucide/svelte/icons/smartphone'
+  import Flag from '@lucide/svelte/icons/flag'
+  import LoaderCircle from '@lucide/svelte/icons/loader-circle'
 
   let s = $state(null)
   let erreur = $state('')
@@ -16,6 +20,7 @@
   let envoyer = $state(true)
   let mur = $state(true)
   let echelle = $state(0.5)
+  let cloture = $state('')         // « en cours » pendant la clôture
   let minuteur
 
   async function lire() {
@@ -38,6 +43,17 @@
   async function arreter() {
     await api.post('/api/douze/arreter')
     lire()
+  }
+
+  async function cloturer() {
+    cloture = 'en cours'
+    erreur = ''
+    try {
+      s = { ...s, ...(await api.post('/api/douze/cloturer')) }
+    } catch (err) {
+      erreur = err.message
+    }
+    cloture = ''
   }
 
   const ecranInvite = (t) => `${s.adresse}/invite/${s.jeton_invite}#saisie=${t.jeton}`
@@ -93,7 +109,19 @@
           <Button onclick={() => jouer(false)}><Play class="size-3.5" aria-hidden="true" />Faire noter</Button>
           <Button variant="outline" onclick={() => jouer(true)}><FastForward class="size-3.5" aria-hidden="true" />Avance rapide</Button>
         {/if}
+        {#if !s.cloturee}
+          <Button variant="outline" onclick={cloturer} disabled={!!cloture}>
+            {#if cloture}<LoaderCircle class="size-3.5 animate-spin" aria-hidden="true" />{:else}<Flag class="size-3.5" aria-hidden="true" />{/if}
+            Clôturer la soirée
+          </Button>
+        {/if}
       </div>
+      {#if s.message}<p class="text-sm" role="status">{s.message}</p>{/if}
+      {#if s.cloturee}
+        <p class="text-sm text-muted-foreground">
+          Clôturée : carnet simulé l'a reçue ; la Gazette simulée en fait son numéro (« À traiter », ou « Relire Douze points »).
+        </p>
+      {/if}
       <ul class="divide-y text-sm">
         {#each s.telephones as t (t.participation_id)}
           <li class="flex flex-wrap items-center gap-x-3 gap-y-1 py-2">

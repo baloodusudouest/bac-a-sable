@@ -5,8 +5,10 @@ Routes : /health (publique), /api/session, /api/connexion, /api/deconnexion,
 /api/applis (état, démarrer, arrêter, vider), /api/personnes (inventer, pièges, copier depuis carnet, épingler,
 effacer), /api/scenarios (créer, jouer, effacer), /api/douze (soirée simulée, téléphones), /api/journal,
 /api/autotest, /api/reglages, /api/synthese, /api/maison/services (fiches « Connexion », contrat 3),
-/externe/sauvegarde (jeton commun, pour l'Anneau), puis l'interface.
-Les applis simulées sont servies par le relais, chacune sur son port (app/relais.py).
+0.4.0 : /api/liens (liens entre applis simulées), /api/maison/remise-a-zero (aperçu et remise à zéro de toute la
+maison simulée), /api/douze/cloturer ; /externe/sauvegarde (jeton commun, pour l'Anneau), puis l'interface.
+Les applis simulées sont servies par le relais, chacune sur son port (app/relais.py) ; le faux annuaire de l'Anneau
+écoute en 127.0.0.1 seulement (app/annuaire.py).
 """
 from __future__ import annotations
 
@@ -24,7 +26,7 @@ from pathlib import Path
 from fastapi import Body, FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
 
-from . import __version__, autotest, base, douze, maison, personnes
+from . import __version__, annuaire, autotest, base, douze, liens, maison, personnes
 from .auth import COMMUN, DUREE, Sessions, en_https
 from .config import APPLI, Config, charger
 from .processus import Gestionnaire, catalogue
@@ -79,6 +81,11 @@ async def _purger_copies() -> None:
 def _faire_autotest() -> dict:
     resultat = autotest.lancer(cfg()) if cfg().autotest else {
         "ok": True, "le": base.maintenant(), "message": "Autotest coupé (essais).", "essais": []}
+    # 0.4.0 (conseil) : adresses des liens toutes en 127.0.0.1, jeton simulé différent du vrai, toujours vérifiés
+    liens_ok, liens_message = autotest.verifier_liens(g())
+    resultat = {**resultat, "liens": {"ok": liens_ok, "message": liens_message}}
+    if not liens_ok:
+        resultat.update(ok=False, message=f"{liens_message} Applis bloquées.")
     ETAT["autotest"] = resultat
     g().bloque = "" if resultat["ok"] else resultat["message"]
     return resultat
@@ -90,7 +97,7 @@ async def cycle(app: FastAPI):
     c.data.mkdir(parents=True, exist_ok=True)
     base.preparer(c.data)
     reglages = maison.Reglages(c.data / "reglages.json", REGLAGES_DEFAUTS, REGLAGES_VARIABLES)
-    gestion = Gestionnaire(c, catalogue(c.catalogue))
+    gestion = Gestionnaire(c, catalogue(c.catalogue), liens.charger(c.catalogue))
     sessions = Sessions(APPLI, c.password, _lire_generation(c))
     ETAT.update(cfg=c, reglages=reglages, sessions=sessions, gestionnaire=gestion, demarrage=time.monotonic())
     ETAT.setdefault("lire_anneau", None)
@@ -99,6 +106,8 @@ async def cycle(app: FastAPI):
     ETAT["regie"] = douze.Regie(relais["douze-points"]) if "douze-points" in relais else None
     await asyncio.to_thread(_faire_autotest)
     taches = [asyncio.create_task(gestion.veiller()), asyncio.create_task(_purger_copies())]
+    if c.annuaire:
+        taches.append(await annuaire.servir(annuaire.FauxAnnuaire(gestion), gestion.port_annuaire))
     if c.relais:
         taches += await servir(list(relais.values()))
     # 0.1.1 : une ligne claire dans le journal du conteneur (Portainer)
@@ -220,18 +229,24 @@ def deconnexion():
 @app.get("/api/applis")
 def applis(request: Request):
     return {"applis": [{**g().etat(a), "adresse": adresse_appli(request, a)} for a in g().applis],
-            "bloque": g().bloque, "max_simultanees": cfg().max_simultanees, "arret_minutes": cfg().arret_minutes}
+            "bloque": g().bloque, "arret_minutes": cfg().arret_minutes, "remise": g().remise,
+            "memoire_mo": round(g().memoire_totale()), "memoire_limite_mo": cfg().memoire_limite_mo}
 
 
 @app.post("/api/applis/{ident}/demarrer")
 async def demarrer(ident: str, request: Request):
+    """0.4.0 : démarre d'abord les applis qu'elle appelle (cascade), puis elle."""
     connu(ident)
+    vivantes_avant = {a for a, e in g().etats.items() if e.vivant()}
     try:
-        etat = await g().demarrer(ident, adresse_publique=adresse_appli(request, ident))
+        etat = await g().ouvrir(ident, adresse_publique=adresse_appli(request, ident))
     except RuntimeError as exc:
         raise HTTPException(409, str(exc)) from exc
-    ETAT["relais"][ident].session = {}
-    return {**etat, "adresse": adresse_appli(request, ident)}
+    for a, e in g().etats.items():
+        if e.vivant() and a not in vivantes_avant:
+            ETAT["relais"][a].session = {}
+    return {**etat, "adresse": adresse_appli(request, ident),
+            "cascade": [g().applis[a].nom for a in g().liens.cascade(ident)]}
 
 
 @app.post("/api/applis/{ident}/arreter")
@@ -419,36 +434,132 @@ def effacer_scenario(sid: int):
     return {"ok": True}
 
 
-@app.post("/api/scenarios/{sid}/jouer")
-async def jouer_scenario(sid: int, request: Request, corps: dict = Body(default={})):
-    """Remet l'appli à zéro, y verse le scénario et la démarre. Pour Douze points, monte aussi la soirée."""
-    ident = str(corps.get("appli", ""))
+def _lire_scenario_complet(sid: int) -> tuple[dict, list[dict]]:
     with base.base(cfg().data) as cx:
         s = base.lire_scenario(cx, sid)
         if not s:
             raise HTTPException(404, "Scénario inconnu.")
-        if ident not in s["applis"]:
-            raise HTTPException(422, "Cette appli ne fait pas partie du scénario.")
         detail = base.personnes(cx, s["personnes"])
-        cx.execute("UPDATE scenario SET joue_le=? WHERE id=?", (base.maintenant(), sid))
-    contenu = {**s, "personnes_detail": detail, "appli": ident}
-    try:
-        await g().demarrer(ident, scenario=contenu, remettre_a_zero=True,
-                           adresse_publique=adresse_appli(request, ident))
-    except RuntimeError as exc:
-        raise HTTPException(409, str(exc)) from exc
-    ETAT["relais"][ident].session = {}
-    res = {"appli": ident, "adresse": adresse_appli(request, ident), "personnes": len(detail),
-           "versees": g().applis[ident].personnes}
-    if ident == "douze-points":
+    return s, detail
+
+
+async def _reverser(s: dict, detail: list[dict], request: Request, ouvrir: str = "") -> dict:
+    """0.4.0 : verse le scénario dans toute la maison simulée (déjà vidée, sous le verrou de la remise à zéro) :
+    chaque appli branchée reçoit les personnes du scénario ; les applis du scénario démarrent (avec celles qu'elles
+    appellent) ; pour Douze points, la soirée est montée, et jouée jusqu'à la clôture si le scénario le dit."""
+    contenu = {**s, "personnes_detail": detail}
+    for ident, a in g().applis.items():
+        if a.branchee:
+            g().preparer_dossier(ident, {**contenu, "appli": ident}, remettre_a_zero=False)
+    a_ouvrir = list(dict.fromkeys(([ouvrir] if ouvrir else []) + list(s["applis"])))
+    for ident in a_ouvrir:
+        await g().ouvrir(ident, adresse_publique=adresse_appli(request, ident), interne=True)
+    for r in ETAT["relais"].values():
+        r.session = {}
+    with base.base(cfg().data) as cx:
+        cx.execute("UPDATE scenario SET joue_le=? WHERE id=?", (base.maintenant(), s["id"]))
+    ETAT["scenario_maison"] = s["id"]
+    res = {"scenario": s["id"], "ouvertes": [g().applis[a].nom for a, e in g().etats.items() if e.vivant()],
+           "personnes": len(detail)}
+    if "douze-points" in a_ouvrir and ETAT.get("regie"):
         r = ETAT["reglages"].tout()
-        reglages = {"telephones": r["douze_telephones"], "chansons": r["douze_chansons"],
-                    **(s["reglages"].get("douze-points") or {})}
+        voulus = s["reglages"].get("douze-points") or {}
+        reglages = {"telephones": r["douze_telephones"], "chansons": r["douze_chansons"], **voulus}
         try:
             res["soiree"] = await ETAT["regie"].preparer(detail, reglages)
+            if voulus.get("cloturee"):
+                await ETAT["regie"].jouer(tempo=0.0, envoyer=True)
+                res["soiree"] = await ETAT["regie"].cloturer()
         except Exception as exc:  # noqa: BLE001 — le message va à l'écran
             raise HTTPException(409, f"Soirée impossible à monter : {exc}") from exc
     return res
+
+
+async def _remettre_la_maison_a_zero(request: Request, sid: int | None, ouvrir: str = "") -> dict:
+    """0.4.0 : une seule remise à zéro pour toute la maison simulée (verrou commun : aucun démarrage pendant ce temps),
+    toutes les bases vidées (Gazette comprise), puis le scénario reversé."""
+    s, detail = _lire_scenario_complet(sid) if sid else (None, [])
+    if s and ouvrir and ouvrir not in s["applis"]:
+        raise HTTPException(422, "Cette appli ne fait pas partie du scénario.")
+    if ETAT.get("regie"):
+        await ETAT["regie"].arreter()
+        ETAT["regie"].soiree = douze.Soiree()
+    try:
+        async with g().remise_a_zero():
+            if not s:
+                ETAT["scenario_maison"] = None
+                return {"scenario": None, "ouvertes": [], "personnes": 0}
+            return await _reverser(s, detail, request, ouvrir)
+    except RuntimeError as exc:
+        raise HTTPException(409, str(exc)) from exc
+
+
+@app.post("/api/scenarios/{sid}/jouer")
+async def jouer_scenario(sid: int, request: Request, corps: dict = Body(default={})):
+    """0.4.0 : jouer un scénario remet toute la maison simulée à zéro et y verse ce scénario (les applis restent
+    cohérentes entre elles), puis ouvre `appli` (et celles qu'elle appelle). Pour Douze points, monte aussi la soirée."""
+    ident = str(corps.get("appli", ""))
+    s, detail = _lire_scenario_complet(sid)
+    if ident not in s["applis"]:
+        raise HTTPException(422, "Cette appli ne fait pas partie du scénario.")
+    res = await _remettre_la_maison_a_zero(request, sid, ouvrir=ident)
+    return {**res, "appli": ident, "adresse": adresse_appli(request, ident), "personnes": len(detail),
+            "versees": g().applis[ident].personnes}
+
+
+def _apercu_remise(sid: int | None) -> dict:
+    """Ce que la remise à zéro fera perdre, et ce qu'elle reversera (affiché avant de confirmer)."""
+    applis_ = []
+    ecritures = photos = 0
+    for ident, a in g().applis.items():
+        d = g().dossier(ident) / "donnees"
+        if d.exists():
+            taille = sum(f.stat().st_size for f in d.rglob("*") if f.is_file())
+            applis_.append({"id": ident, "nom": a.nom, "taille_ko": round(taille / 1024)})
+        try:
+            for ligne in g().journal_appli(ident).read_text(encoding="utf-8", errors="replace").splitlines():
+                if '"sorte": "ecriture"' in ligne:
+                    ecritures += 1
+                    photos += 1 if "/assets" in ligne else 0
+        except OSError:
+            pass
+    regie = ETAT.get("regie")
+    soiree = regie.resume() if regie else {}
+    reverse = None
+    if sid:
+        s, detail = _lire_scenario_complet(sid)
+        voulus = s["reglages"].get("douze-points") or {}
+        reverse = {"id": s["id"], "nom": s["nom"], "personnes": len(detail),
+                   "copies": sum(1 for p in detail if p["origine"] == "reelle"),
+                   "applis": [g().applis[a].nom for a in s["applis"] if a in g().applis],
+                   "soiree": "douze-points" in s["applis"], "soiree_cloturee": bool(voulus.get("cloturee"))}
+    return {"perdu": {"applis": applis_, "ecritures": ecritures, "photos": photos,
+                      "soiree": bool(soiree.get("soiree_id")), "soiree_cloturee": bool(soiree.get("cloturee"))},
+            "reverse": reverse, "scenario_maison": ETAT.get("scenario_maison")}
+
+
+@app.get("/api/maison/remise-a-zero")
+def apercu_remise(scenario: int | None = None):
+    return _apercu_remise(scenario if scenario is not None else ETAT.get("scenario_maison"))
+
+
+@app.post("/api/maison/remise-a-zero")
+async def remise_a_zero(request: Request, corps: dict = Body(default={})):
+    """Remet toute la maison simulée à zéro (confirmation obligatoire), puis reverse le scénario choisi (s'il y en a)."""
+    if corps.get("confirmer") is not True:
+        raise HTTPException(422, "Confirme la remise à zéro : tout ce qui a été joué dans la maison simulée sera perdu.")
+    sid = corps.get("scenario")
+    return await _remettre_la_maison_a_zero(request, int(sid) if sid else None)
+
+
+@app.get("/api/liens")
+def lister_liens():
+    """0.4.0 : les liens entre applis simulées (branchés ou coupés, et pourquoi), et la copie figée des flux."""
+    figes = liens.flux_figes(Path(cfg().catalogue).parent / "docs" / "flux-maison.json") \
+        if (Path(cfg().catalogue).parent / "docs" / "flux-maison.json").is_file() else []
+    ecart = liens.comparer(g().liens.tous, figes, g().applis) if figes else {"manquants": [], "en_trop": []}
+    return {"liens": g().liens.etat(), "ecart": ecart,
+            "vivantes": [a for a, e in g().etats.items() if e.vivant()]}
 
 
 # ================================================================ Douze points : soirée simulée
@@ -474,6 +585,18 @@ async def douze_jouer(corps: dict = Body(default={})):
     tempo = 0.0 if corps.get("avance_rapide") else float(corps.get("tempo", ETAT["reglages"].tout()["douze_tempo"]))
     try:
         return await regie.jouer(tempo=max(0.0, min(tempo, 120.0)), envoyer=bool(corps.get("envoyer", True)))
+    except ValueError as exc:
+        raise HTTPException(409, str(exc)) from exc
+
+
+@app.post("/api/douze/cloturer")
+async def douze_cloturer():
+    """0.4.0 : la soirée jusqu'au bout (dévoilement, fin, clôture) : carnet simulé la reçoit, la Gazette simulée la lit."""
+    regie = ETAT.get("regie")
+    if not regie or not g().etats["douze-points"].vivant():
+        raise HTTPException(409, "Lance d'abord un scénario sur Douze points.")
+    try:
+        return await regie.cloturer()
     except ValueError as exc:
         raise HTTPException(409, str(exc)) from exc
 

@@ -1,0 +1,167 @@
+{
+ "source": "carte de la maison (coffre), flux entre applis maison",
+ "commit_coffre": "9f3599f",
+ "tire_le": "2026-11-20",
+ "flux": [
+  {
+   "de": "anneau",
+   "vers": "carnet",
+   "nature": "donnees"
+  },
+  {
+   "de": "anneau",
+   "vers": "gazette",
+   "nature": "cookie"
+  },
+  {
+   "de": "anneau",
+   "vers": "kit-urgence",
+   "nature": "cookie"
+  },
+  {
+   "de": "anneau",
+   "vers": "millesime",
+   "nature": "cookie"
+  },
+  {
+   "de": "anneau",
+   "vers": "sillage",
+   "nature": "cookie"
+  },
+  {
+   "de": "anneau",
+   "vers": "transhumance",
+   "nature": "cookie"
+  },
+  {
+   "de": "anneau",
+   "vers": "verif-dates-photos",
+   "nature": "cookie"
+  },
+  {
+   "de": "carnet",
+   "vers": "anneau",
+   "nature": "donnees"
+  },
+  {
+   "de": "carnet",
+   "vers": "douze-points",
+   "nature": "donnees"
+  },
+  {
+   "de": "carnet",
+   "vers": "gazette",
+   "nature": "donnees"
+  },
+  {
+   "de": "carnet",
+   "vers": "kit-urgence",
+   "nature": "donnees"
+  },
+  {
+   "de": "carnet",
+   "vers": "sillage",
+   "nature": "donnees"
+  },
+  {
+   "de": "chambre-noire",
+   "vers": "millesime",
+   "nature": "donnees"
+  },
+  {
+   "de": "chambre-noire",
+   "vers": "sillage",
+   "nature": "donnees"
+  },
+  {
+   "de": "comptoir",
+   "vers": "anneau",
+   "nature": "donnees"
+  },
+  {
+   "de": "douze-points",
+   "vers": "anneau",
+   "nature": "donnees"
+  },
+  {
+   "de": "douze-points",
+   "vers": "carnet",
+   "nature": "donnees"
+  },
+  {
+   "de": "douze-points",
+   "vers": "gazette",
+   "nature": "donnees"
+  },
+  {
+   "de": "gazette",
+   "vers": "anneau",
+   "nature": "donnees"
+  },
+  {
+   "de": "gazette",
+   "vers": "carnet",
+   "nature": "donnees"
+  },
+  {
+   "de": "kit-urgence",
+   "vers": "anneau",
+   "nature": "donnees"
+  },
+  {
+   "de": "millesime",
+   "vers": "anneau",
+   "nature": "donnees"
+  },
+  {
+   "de": "millesime",
+   "vers": "carnet",
+   "nature": "donnees"
+  },
+  {
+   "de": "millesime",
+   "vers": "transhumance",
+   "nature": "commande"
+  },
+  {
+   "de": "scriptorium",
+   "vers": "anneau",
+   "nature": "donnees"
+  },
+  {
+   "de": "scriptorium",
+   "vers": "comptoir",
+   "nature": "donnees"
+  },
+  {
+   "de": "sillage",
+   "vers": "anneau",
+   "nature": "donnees"
+  },
+  {
+   "de": "sillage",
+   "vers": "carnet",
+   "nature": "donnees"
+  },
+  {
+   "de": "sillage",
+   "vers": "gazette",
+   "nature": "donnees"
+  },
+  {
+   "de": "sillage",
+   "vers": "millesime",
+   "nature": "donnees"
+  },
+  {
+   "de": "transhumance",
+   "vers": "anneau",
+   "nature": "donnees"
+  },
+  {
+   "de": "verif-dates-photos",
+   "vers": "anneau",
+   "nature": "donnees"
+  }
+ ]
+}

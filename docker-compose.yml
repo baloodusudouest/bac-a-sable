@@ -26,7 +26,7 @@ services:
       - BAC_CARNET_URL=${BAC_CARNET_URL:-}       # adresse de carnet vue depuis ce conteneur ; vide : pas de copie de vraies fiches
       - BAC_AUTOTEST=${BAC_AUTOTEST:-}           # adresses à essayer en plus à l'autotest (hôte:port, séparées par des virgules)
       - BAC_ARRET_MINUTES=${BAC_ARRET_MINUTES:-30}
-      - BAC_MAX_SIMULTANEES=${BAC_MAX_SIMULTANEES:-4}
+      - BAC_MEMOIRE_MO=${BAC_MEMOIRE_MO:-2400}     # 0.4.0 : au-delà (toute la maison, Chromium compris), l'appli la moins récente s'arrête
     volumes:
       - ${DOCKER_ROOT}/bac-a-sable:/data          # à exclure des sauvegardes (copies de vraies fiches)
     mem_limit: 3g

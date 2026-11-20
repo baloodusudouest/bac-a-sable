@@ -5,13 +5,18 @@ Usage : python lanceurs/carnet.py <dossier> <port>   (lancé dans le code source
 Avec un scénario (BAS_SCENARIO) : les personnes du scénario deviennent les fiches du faux iCloud (nom, téléphone,
 courriel, naissance, liens de famille en « personnes liées » comme sur l'iPhone) ; la moitié environ a son double
 dans le faux Immich, écrit un peu autrement (majuscules, accents), pour que carnet propose des liens à vérifier.
-Sans scénario : les contacts de démonstration du dépôt (tests/interface/serveur.py).
+Sans scénario (0.4.0, « plus de données de démo ») : carnet simulé démarre sans aucune fiche.
+
+0.4.0 : le jeton commun simulé (MAISON_JETON, tiré par le Bac à sable) ouvre les portes des autres applis simulées
+branchées : Douze points lit /douze-points/personnes et envoie ses soirées sur /evenements/…, la Gazette lit
+/gazette/personnes et écrit ses parutions. Les fiches portent l'identifiant « BAS-<id de la personne du Bac à sable> »
+(le carnet_id que voient les autres applis). Sillage, Millésime et le kit sont encore en démo : leurs liens avec
+carnet restent coupés (Sillage n'est pas lu, Millésime et Immich restent les faux des tests).
 
 Tout passe par les faux services des tests de carnet (MockTransport) : rien ne sort.
 """
 from __future__ import annotations
 
-import dataclasses
 import json
 import os
 import random
@@ -23,7 +28,7 @@ import uvicorn
 
 sys.path.insert(0, os.getcwd())
 
-from app import icloud, liaisons, main  # noqa: E402  (le code de carnet, répertoire courant)
+from app import coffre, icloud, liaisons, main  # noqa: E402  (le code de carnet, répertoire courant)
 from app.carnet import Carnet  # noqa: E402
 from tests.faux_icloud import FauxICloud  # noqa: E402
 from tests.faux_services import FauxImmich, FauxTreemich  # noqa: E402
@@ -110,12 +115,9 @@ if __name__ == "__main__":
     dossier.mkdir(parents=True, exist_ok=True)
     chemin = Path(os.environ.get("BAS_SCENARIO", ""))
     scenario = json.loads(chemin.read_text(encoding="utf-8")) if chemin.is_file() else None
-    if scenario and scenario.get("personnes_detail"):
-        carnet = preparer(dossier, scenario)
-    else:
-        carnet, _ = demo.preparer(dossier)
-        # la démonstration du dépôt a son propre mot de passe : on met celui que le relais connaît
-        carnet.cfg = dataclasses.replace(carnet.cfg, password=os.environ["BAS_MOT_DE_PASSE"])
+    carnet = preparer(dossier, scenario or {"personnes_detail": []})
+    # 0.4.0 : Sillage est encore en démo (lien coupé) : carnet ne le lit pas
+    coffre.LIRE_SILLAGE = lambda c, immich_id: None
     main.ETAT["carnet"] = carnet
     threading.excepthook = lambda a: None
     uvicorn.run(main.app, host="127.0.0.1", port=port, log_level="warning")

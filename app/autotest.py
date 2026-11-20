@@ -72,3 +72,18 @@ def lancer(cfg) -> dict:
         message = f"Rien ne sort : {len(essais)} essais, tous refusés par la garde."
     return {"ok": ok, "le": datetime.now().astimezone().isoformat(timespec="seconds"), "message": message,
             "essais": essais}
+
+
+def verifier_liens(gestionnaire) -> tuple[bool, str]:
+    """0.4.0 (conseil) : avant toute appli, on construit l'environnement de chacune comme au lancement et on vérifie
+    que ses adresses (`*_URL`) visent toutes 127.0.0.1 et qu'aucune variable ne vaut le vrai jeton commun de la maison
+    (le jeton simulé est tiré au hasard à chaque démarrage). Rouge : aucune appli ne démarre."""
+    try:
+        n = 0
+        for a in gestionnaire.applis.values():
+            env = gestionnaire.environnement(a)          # lève RuntimeError si une règle est enfreinte
+            n += sum(1 for k in env if k.endswith("_URL"))
+    except RuntimeError as exc:
+        return False, str(exc)
+    branches = len(gestionnaire.liens.branches())
+    return True, f"{branches} liens branchés entre applis simulées ; {n} adresses, toutes en 127.0.0.1 ; jeton simulé."

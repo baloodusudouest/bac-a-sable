@@ -37,11 +37,17 @@ PROFILS = {"genereux": "Généreux", "severe": "Sévère", "fan": "Fan d'un pays
            "taiseux": "Ne commente jamais"}
 
 
-def chansons(n: int, graine: int | None = None) -> list[dict]:
+def chansons(n: int, graine: int | None = None, voulus: list[str] | None = None) -> list[dict]:
+    """`n` chansons de pays réels tirés au hasard ; `voulus` (0.4.0) : ces pays-là, dans cet ordre (noms français)."""
     rng = random.Random(graine)
-    pays = rng.sample(PAYS, k=min(max(int(n), 1), len(PAYS)))
+    if voulus:
+        codes = dict(PAYS)
+        pays = [(x, codes.get(x, "")) for x in dict.fromkeys(str(v).strip() for v in voulus) if x][:len(PAYS)]
+    else:
+        pays = rng.sample(PAYS, k=min(max(int(n), 1), len(PAYS)))
     artistes = rng.sample(ARTISTES, k=len(pays))
-    return [{"pays": p, "code_pays": c, "artiste": a, "titre": f"{rng.choice(MOTS)}" + rng.choice(["", " " + rng.choice(MOTS).lower()])}
+    return [{"pays": p, "code_pays": c or None, "artiste": a,
+             "titre": f"{rng.choice(MOTS)}" + rng.choice(["", " " + rng.choice(MOTS).lower()])}
             for (p, c), a in zip(pays, artistes)]
 
 
@@ -86,6 +92,7 @@ class Soiree:
     chansons: list[dict] = field(default_factory=list)
     taches: list[asyncio.Task] = field(default_factory=list)
     message: str = ""
+    cloturee: bool = False
 
 
 class Regie:
@@ -118,11 +125,19 @@ class Regie:
                                                    "ville": "Bac à sable"})
             r.raise_for_status()
             sid = r.json()["id"]
-            liste = chansons(n_chansons, graine)
+            liste = chansons(n_chansons, graine, reglages.get("pays"))
             (await c.put(f"/api/soirees/{sid}/chansons", json={"chansons": liste})).raise_for_status()
             ids = []
             vus: set[str] = set()
             for p in personnes:
+                # 0.4.0 : l'invité est choisi dans carnet simulé (fiche « BAS-<id> », lanceurs/carnet.py), comme
+                # l'hôte le ferait : le journal de la soirée garde son identifiant de carnet (la Gazette simulée s'en
+                # sert pour écarter les copies de vraies fiches). Carnet absent ou fiche sans prénom : prénom tapé.
+                if p.get("id") is not None and p.get("prenom"):
+                    r = await c.post("/api/invites", json={"carnet_id": f"BAS-{int(p['id']):05d}"})
+                    if r.status_code == 200:
+                        ids.append(r.json()["id"])
+                        continue
                 prenom = (p.get("prenom") or "Invité").strip()[:30]
                 if prenom.lower() in vus:
                     prenom = f"{prenom} {(p.get('nom') or '?')[:1]}."
@@ -158,7 +173,7 @@ class Regie:
     def resume(self) -> dict:
         s = self.soiree
         return {"soiree_id": s.soiree_id, "jeton_invite": s.jeton_invite, "chansons": len(s.chansons),
-                "message": s.message, "libres": s.libres,
+                "message": s.message, "libres": s.libres, "cloturee": s.cloturee,
                 "telephones": [{"participation_id": t.participation_id, "prenom": t.prenom, "profil": t.profil,
                                 "profil_nom": PROFILS[t.profil], "prefere": t.prefere if t.profil == "fan" else "",
                                 "jeton": t.jeton, "notees": t.notees, "etat": t.etat, "erreur": t.erreur}
@@ -179,6 +194,32 @@ class Regie:
         for t in self.soiree.taches:
             t.cancel()
         self.soiree.taches = []
+
+    async def cloturer(self, attente: float = 120.0) -> dict:
+        """0.4.0 : la soirée jusqu'au bout, comme l'hôte : on attend les téléphones simulés, puis dévoilement,
+        fin du dévoilement et clôture (« À traiter »). La clôture envoie la soirée à carnet simulé et fige le journal
+        lu par la Gazette simulée."""
+        s = self.soiree
+        if not s.soiree_id:
+            raise ValueError("Prépare d'abord la soirée.")
+        if s.taches:
+            await asyncio.wait(s.taches, timeout=attente)
+        async with await self._client() as c:
+            detail = (await c.get(f"/api/soirees/{s.soiree_id}")).json()
+            if detail.get("etat") == "ouverte":
+                r = await c.post(f"/api/soirees/{s.soiree_id}/devoiler", json={"forcer": True})
+                if r.status_code >= 400:
+                    raise ValueError(f"dévoilement refusé par Douze points ({r.status_code}) : {r.text[:200]}")
+            r = await c.post(f"/api/soirees/{s.soiree_id}/terminer")
+            if r.status_code >= 400:
+                raise ValueError(f"fin du dévoilement refusée par Douze points ({r.status_code}) : {r.text[:200]}")
+            r = await c.post(f"/api/soirees/{s.soiree_id}/cloturer", json={})
+            if r.status_code >= 400:
+                raise ValueError(f"clôture refusée par Douze points ({r.status_code}) : {r.text[:200]}")
+            res = r.json()
+        s.message = f"Soirée clôturée (version {res.get('version')}) ; carnet : {res.get('carnet') or '—'}"
+        s.cloturee = True
+        return {**self.resume(), "cloture": res}
 
     async def _telephone(self, t: Telephone, tempo: float, envoyer: bool) -> None:
         rng = random.Random(t.participation_id * 7919)

@@ -4,6 +4,10 @@
    Unix) est refusée, et aucun nom autre que « localhost » n'est résolu (pas même une requête DNS).
    Une appli simulée ne peut donc joindre ni le NAS, ni Immich, ni Home Assistant, ni Internet, quelle que soit
    la bibliothèque (httpx, requests, urllib, telethon…). Chaque refus est noté dans le journal.
+   0.4.0 (garde resserrée, conseil) : sur la machine elle-même, l'appli ne joint que les ports de BAS_PORTS (ceux des
+   applis simulées qu'elle appelle par un lien branché, le faux annuaire de l'Anneau, son propre port) et ceux
+   qu'elle a ouverts elle-même (les faux serveurs de sa démonstration, lancés dans son processus). Le Bac à sable
+   (port 8104), les autres applis simulées et leurs relais lui restent fermés.
 2. Journal : chaque écriture reçue par un faux service (httpx.MockTransport des démonstrations, ou faux
    serveur local) est notée : « carnet aurait écrit dans … ».
 
@@ -23,6 +27,8 @@ _APPLI = os.environ.get("BAS_APPLI", "?")
 _JOURNAL = os.environ.get("BAS_JOURNAL", "")
 _VERROU = threading.Lock()
 _ECRITURES = {"POST", "PUT", "PATCH", "DELETE"}
+_PORTS = {int(x) for x in os.environ.get("BAS_PORTS", "").split(",") if x.strip().isdigit()}
+_OUVERTS: set[int] = set()        # ports que ce processus a ouverts lui-même (bind)
 
 
 def noter(sorte: str, **champs) -> None:
@@ -62,10 +68,15 @@ def _verifier(adresse, famille) -> None:
     if not _locale(hote):
         noter("sortie_refusee", vers=str(hote))
         raise SortieRefusee(f"Bac à sable : sortie vers {hote} refusée (rien ne sort).")
+    port = adresse[1] if isinstance(adresse, tuple) and len(adresse) > 1 else None
+    if isinstance(port, int) and port not in _PORTS and port not in _OUVERTS:
+        noter("sortie_refusee", vers=f"{hote}:{port}", motif="port local hors des liens de l'appli")
+        raise SortieRefusee(f"Bac à sable : port local {port} refusé (pas un lien de cette appli).")
 
 
 _connect = socket.socket.connect
 _connect_ex = socket.socket.connect_ex
+_bind = socket.socket.bind
 _getaddrinfo = socket.getaddrinfo
 _gethostbyname = socket.gethostbyname
 
@@ -78,6 +89,17 @@ def _connect_garde(self, adresse):
 def _connect_ex_garde(self, adresse):
     _verifier(adresse, self.family)
     return _connect_ex(self, adresse)
+
+
+def _bind_garde(self, adresse):
+    """Un port ouvert par l'appli elle-même (son serveur, un faux serveur de sa démonstration) lui reste joignable."""
+    res = _bind(self, adresse)
+    try:
+        if self.family in (socket.AF_INET, socket.AF_INET6):
+            _OUVERTS.add(int(self.getsockname()[1]))
+    except (OSError, ValueError, IndexError, TypeError):
+        pass
+    return res
 
 
 def _est_adresse(hote) -> bool:
@@ -107,6 +129,7 @@ def _gethostbyname_garde(hote):
 
 socket.socket.connect = _connect_garde
 socket.socket.connect_ex = _connect_ex_garde
+socket.socket.bind = _bind_garde
 socket.getaddrinfo = _getaddrinfo_garde
 socket.gethostbyname = _gethostbyname_garde
 

@@ -210,6 +210,7 @@ COPY app ./app
 COPY garde ./garde
 COPY lanceurs ./lanceurs
 COPY tests ./tests
+COPY docs/flux-maison.json ./docs/flux-maison.json
 COPY --from=interface /app/static ./app/static
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod 755 /entrypoint.sh && chmod -R a+rX /applis /app
