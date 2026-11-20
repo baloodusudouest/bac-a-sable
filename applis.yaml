@@ -120,8 +120,8 @@ applis:
   millesime:
     nom: Millésime
     depot: millesime
-    version: 2.15.1
-    sha: 0bcd8da23ad2ecbd1fba2ab0fff88094ec5877a1
+    version: 2.16.0
+    sha: 896a7a3cb4323d2a68f474fd3e7e32632c917b60
     port: 8117
     lanceur: demo
     module: tests.interface.serveur

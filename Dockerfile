@@ -95,10 +95,10 @@ COPY --from=py-kit-urgence /src /build
 WORKDIR /build/frontend
 RUN npm ci --no-audit --no-fund && npx vite build --outDir /out --emptyOutDir
 
-# ---------- Millésime 2.15.1 (millesime @ 0bcd8da) ----------
+# ---------- Millésime 2.16.0 (millesime @ 896a7a3) ----------
 FROM python:3.12-slim-bookworm AS py-millesime
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev && rm -rf /var/lib/apt/lists/*
-ADD --keep-git-dir=false https://github.com/baloodusudouest/millesime.git#0bcd8da23ad2ecbd1fba2ab0fff88094ec5877a1 /src
+ADD --keep-git-dir=false https://github.com/baloodusudouest/millesime.git#896a7a3cb4323d2a68f474fd3e7e32632c917b60 /src
 RUN pip install --no-cache-dir --target /site -r /src/requirements.txt && rm -rf /src/.github
 FROM node:22-bookworm-slim AS ui-millesime
 COPY --from=py-millesime /src /build

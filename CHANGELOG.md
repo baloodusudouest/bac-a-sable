@@ -1,5 +1,9 @@
 # Journal des versions
 
+## 0.3.1 — 20 novembre 2026 (Millésime 2.16.0)
+- Millésime embarqué en 2.16.0 (fiche « Sillage » dans Connexion), au lieu de 2.15.1. `applis.yaml` et Dockerfile refait.
+- **Jamais essayé sur la vraie installation.**
+
 ## 0.3.0 — 20 novembre 2026 (toutes les applis embarquées à jour, socle 0.11.1)
 - Les applis embarquées passent aux versions du chantier « fiches Connexion » : l'Anneau 0.16.1 (au lieu de 0.14.0), carnet 3.3.1 (3.2.0), Chambre noire 0.9.1 (0.8.0), Comptoir 0.8.1 (0.7.0), Douze points 1.10.2 (1.10.1), Gazette 0.29.1 (0.27.0), kit d'urgence 2.7.1 (2.6.1), Millésime 2.15.1 (2.14.0), Scriptorium 0.8.1 (0.7.0), Sillage 0.21.1 (0.20.0), Transhumance 0.9.2 (0.8.0) ; Éphéméride inchangée (3.3.0). `applis.yaml` et Dockerfile refait par `tools/dockerfile.py`.
 - Copies communes du socle 0.11.1 (« Pour le relier » quand le réglage est dans l'appli).
