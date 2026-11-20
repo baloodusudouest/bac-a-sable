@@ -1,5 +1,9 @@
 # Journal des versions
 
+## 0.3.2 — 20 novembre 2026 (Douze points 1.10.3)
+- Douze points embarqué en 1.10.3 (écran télé lisible sur un petit écran en paysage : QR code et mode d'emploi), au lieu de 1.10.2. `applis.yaml` et Dockerfile refait.
+- **Jamais essayé sur la vraie installation.**
+
 ## 0.3.1 — 20 novembre 2026 (Millésime 2.16.0)
 - Millésime embarqué en 2.16.0 (fiche « Sillage » dans Connexion), au lieu de 2.15.1. `applis.yaml` et Dockerfile refait.
 - **Jamais essayé sur la vraie installation.**
