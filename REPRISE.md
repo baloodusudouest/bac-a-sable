@@ -5,6 +5,7 @@ que le code.
 
 ## État (20/11/2026)
 
+- **0.3.3 (20/11/2026)** : Douze points 1.11.0 embarqué.
 - **0.3.2 (20/11/2026)** : Douze points 1.10.3 embarqué.
 - **0.3.1 (20/11/2026)** : Millésime 2.16.0 embarqué.
 - **0.3.0 (20/11/2026)** : toutes les applis embarquées aux versions du chantier « fiches Connexion » (voir CHANGELOG) ; socle 0.11.1.

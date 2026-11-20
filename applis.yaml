@@ -79,8 +79,8 @@ applis:
   douze-points:
     nom: Douze points
     depot: douze-points
-    version: 1.10.3
-    sha: e5dbf8156aa11c2968c6225a63a00a0cd2c1959c
+    version: 1.11.0
+    sha: 9a6ede4ca2848d1ce0e75f8484a7e56426172d6c
     port: 8114
     lanceur: bac
     mot_de_passe: essai-bac-a-sable
