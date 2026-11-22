@@ -3,6 +3,10 @@
 Fichier à lire en premier dans une nouvelle session, et à mettre à jour à chaque fin de session, dans le même commit
 que le code.
 
+## État (22/11/2026, suite)
+
+- **0.4.2 (22/11/2026)** : barre d'onglets collée en bas sur iPhone (`frontend/src/App.svelte`), toutes les applis embarquées aux versions du lot « barre collée en bas » (voir CHANGELOG). Le faux Immich commun devient 0.4.3. **Jamais essayé sur la vraie installation.**
+
 ## État (22/11/2026)
 
 - **0.4.1 (22/11/2026)** : L'Anneau 0.17.2, Douze points 1.14.0, Gazette 0.30.0 embarqués (demande de Julien : appliquer au Bac à sable les mises à jour du coffre). Lanceurs inchangés ; `docs/flux-maison.json` retiré de la carte (aucun flux nouveau). Le faux Immich commun, prévu « 0.4.1 », devient 0.4.2. **Jamais essayé sur la vraie installation.**
@@ -56,7 +60,7 @@ que le code.
 
 1. Paquet ghcr `bac-a-sable` : le rendre public si Portainer ne peut pas le tirer (paquet neuf, privé par défaut).
 2. Installer sur le NAS (stack), lancer l'autotest avec `BAC_AUTOTEST` (adresses réelles de la maison).
-3. **0.4.2** : faux Immich commun (service à part sous la garde, son journal, tests de contrat rejouant les faux Immich
+3. **0.4.3** : faux Immich commun (service à part sous la garde, son journal, tests de contrat rejouant les faux Immich
    des dépôts) ; ajouter son port à `ports_permis` ; les photos des duos de Douze points arrivent alors dans la Gazette.
 4. **0.4.x** : un lanceur par appli restante (Sillage, Millésime, Chambre noire, Kit, Comptoir, Scriptorium,
    Transhumance, Éphéméride) ; chaque nouveau lanceur branche ses liens (rien d'autre à changer : `liens:` les porte
