@@ -25,10 +25,10 @@ RUN pip install --no-cache-dir --target /commun pytest==8.4.2
 FROM python:3.12-slim-bookworm AS pandoc
 ADD https://github.com/jgm/pandoc/releases/download/3.1.3/pandoc-3.1.3-1-amd64.deb /pandoc.deb
 
-# ---------- L'Anneau 0.17.3 (anneau @ 1ab532b) ----------
+# ---------- L'Anneau 0.18.0 (anneau @ 430873b) ----------
 FROM python:3.12-slim-bookworm AS py-anneau
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev && rm -rf /var/lib/apt/lists/*
-ADD --keep-git-dir=false https://github.com/baloodusudouest/anneau.git#1ab532b6f00f93996e39a66e2a351a45f575fb27 /src
+ADD --keep-git-dir=false https://github.com/baloodusudouest/anneau.git#430873bd1b7991d9eb29551332cedc35f5cbe27c /src
 RUN pip install --no-cache-dir --target /site -r /src/requirements.txt && rm -rf /src/.github
 FROM node:22-bookworm-slim AS ui-anneau
 COPY --from=py-anneau /src /build

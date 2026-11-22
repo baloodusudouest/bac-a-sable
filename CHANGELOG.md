@@ -1,5 +1,9 @@
 # Journal des versions
 
+## 0.4.3 — 22/11/2026
+
+- L'Anneau 0.18.0 embarqué : « À faire quand tu veux » montre les applis de la stack à mettre à jour (ligne repliée, bouton par appli, double confirmation pour les protégés). Dans la démonstration, les registres d'images sont simulés en mémoire : rien ne sort.
+
 ## 0.4.2 — 22 novembre 2026 (barre d'onglets collée en bas, applis à jour)
 - **iPhone : barre d'onglets du Bac à sable collée au bord bas**, sur toute la largeur (demande de Julien du 22/11/2026, socle 0.12.1).
 - **Toutes les applis embarquées aux versions du même jour**, qui ont aussi leur barre collée en bas : L'Anneau 0.17.3, carnet 3.3.2 (avec l'index des lettres corrigé), Chambre noire 0.9.2, Comptoir 0.8.2, Douze points 1.14.1, Gazette 0.30.1, Kit d'urgence 2.7.2, Millésime 2.16.1, Scriptorium 0.8.2, Sillage 0.21.2, Transhumance 0.9.5, Éphéméride 3.3.1.
