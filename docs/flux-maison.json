@@ -1,7 +1,7 @@
 {
  "source": "carte de la maison (coffre), flux entre applis maison",
- "commit_coffre": "9f3599f",
- "tire_le": "2026-11-20",
+ "commit_coffre": "be69fff",
+ "tire_le": "2026-11-22",
  "flux": [
   {
    "de": "anneau",

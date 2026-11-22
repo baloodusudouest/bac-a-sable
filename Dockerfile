@@ -25,10 +25,10 @@ RUN pip install --no-cache-dir --target /commun pytest==8.4.2
 FROM python:3.12-slim-bookworm AS pandoc
 ADD https://github.com/jgm/pandoc/releases/download/3.1.3/pandoc-3.1.3-1-amd64.deb /pandoc.deb
 
-# ---------- L'Anneau 0.16.1 (anneau @ f2a8114) ----------
+# ---------- L'Anneau 0.17.2 (anneau @ b6f0acc) ----------
 FROM python:3.12-slim-bookworm AS py-anneau
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev && rm -rf /var/lib/apt/lists/*
-ADD --keep-git-dir=false https://github.com/baloodusudouest/anneau.git#f2a811486712e361b9d1111fcc7d5029198cdcbe /src
+ADD --keep-git-dir=false https://github.com/baloodusudouest/anneau.git#b6f0acc8e80f74019b1796e6b079588af220c5af /src
 RUN pip install --no-cache-dir --target /site -r /src/requirements.txt && rm -rf /src/.github
 FROM node:22-bookworm-slim AS ui-anneau
 COPY --from=py-anneau /src /build
@@ -65,20 +65,20 @@ COPY --from=py-comptoir /src /build
 WORKDIR /build/frontend
 RUN npm ci --no-audit --no-fund && npx vite build --outDir /out --emptyOutDir
 
-# ---------- Douze points 1.11.0 (douze-points @ 9a6ede4) ----------
+# ---------- Douze points 1.14.0 (douze-points @ ac80e9c) ----------
 FROM python:3.12-slim-bookworm AS py-douze-points
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev && rm -rf /var/lib/apt/lists/*
-ADD --keep-git-dir=false https://github.com/baloodusudouest/douze-points.git#9a6ede4ca2848d1ce0e75f8484a7e56426172d6c /src
+ADD --keep-git-dir=false https://github.com/baloodusudouest/douze-points.git#ac80e9cc3274c842e7701904a49058798e206131 /src
 RUN pip install --no-cache-dir --target /site -r /src/requirements.txt && rm -rf /src/.github
 FROM node:22-bookworm-slim AS ui-douze-points
 COPY --from=py-douze-points /src /build
 WORKDIR /build/frontend
 RUN npm ci --no-audit --no-fund && npx vite build --outDir /out --emptyOutDir
 
-# ---------- Gazette 0.29.1 (gazette @ 27e96b5) ----------
+# ---------- Gazette 0.30.0 (gazette @ 2301eeb) ----------
 FROM python:3.12-slim-bookworm AS py-gazette
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev && rm -rf /var/lib/apt/lists/*
-ADD --keep-git-dir=false https://github.com/baloodusudouest/gazette.git#27e96b5e6e33e31d5ec99f6ef061d8d8f8afa564 /src
+ADD --keep-git-dir=false https://github.com/baloodusudouest/gazette.git#2301eeb4afad75461490295b85a04f5695bdd935 /src
 RUN pip install --no-cache-dir --target /site -r /src/requirements.txt && rm -rf /src/.github
 FROM node:22-bookworm-slim AS ui-gazette
 COPY --from=py-gazette /src /build

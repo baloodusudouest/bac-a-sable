@@ -28,8 +28,8 @@ applis:
   anneau:
     nom: L'Anneau
     depot: anneau
-    version: 0.16.1
-    sha: f2a811486712e361b9d1111fcc7d5029198cdcbe
+    version: 0.17.2
+    sha: b6f0acc8e80f74019b1796e6b079588af220c5af
     port: 8110
     lanceur: demo
     module: tests.interface.serveur
@@ -83,8 +83,8 @@ applis:
   douze-points:
     nom: Douze points
     depot: douze-points
-    version: 1.11.0
-    sha: 9a6ede4ca2848d1ce0e75f8484a7e56426172d6c
+    version: 1.14.0
+    sha: ac80e9cc3274c842e7701904a49058798e206131
     port: 8114
     lanceur: bac
     mot_de_passe: essai-bac-a-sable
@@ -95,8 +95,8 @@ applis:
   gazette:
     nom: Gazette
     depot: gazette
-    version: 0.29.1
-    sha: 27e96b5e6e33e31d5ec99f6ef061d8d8f8afa564
+    version: 0.30.0
+    sha: 2301eeb4afad75461490295b85a04f5695bdd935
     port: 8115
     lanceur: bac
     mot_de_passe: essai-bac-a-sable

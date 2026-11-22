@@ -1,5 +1,12 @@
 # Journal des versions
 
+## 0.4.1 — 22 novembre 2026 (applis embarquées à jour)
+
+- **L'Anneau 0.17.2**, **Douze points 1.14.0** et **Gazette 0.30.0** embarqués : versions et commits relevés dans le coffre et sur les étiquettes des dépôts le 22/11/2026.
+- Lanceurs de Douze points et de la Gazette inchangés. Pour la Gazette, les nouveaux réglages Paperless restent vides : rien n'est rangé, et aucune adresse n'est ouverte.
+- Copie figée des flux (`docs/flux-maison.json`) retirée de la carte du coffre : aucun flux nouveau entre applis embarquées.
+- Les autres applis étaient déjà à jour. Dîme n'est pas embarquée (dépôt privé).
+
 ## 0.4.0 — 20 novembre 2026 (« la maison branchée »)
 Dossier `docs/ajout-0.4.0.md`, avis du conseil `docs/conseil-0.4.0.md` (points 1 à 11). Origine : la Gazette du Bac à sable affichait « Pays 6, Pays 12 » alors que Douze points simulé avait joué une soirée Portugal, Pologne…
 
