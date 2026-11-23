@@ -3,6 +3,8 @@
 Fichier à lire en premier dans une nouvelle session, et à mettre à jour à chaque fin de session, dans le même commit
 que le code.
 
+## État (23/11/2026) — 0.4.4 : listes déroulantes lisibles en sombre (`frontend/src/app.css`, bloc « Listes déroulantes (socle 0.12.2) » : `select option, select optgroup` aux couleurs `--popover`). Jamais essayé sur la vraie installation.
+
 ## État (22/11/2026, suite)
 
 - **0.4.3 (22/11/2026)** : L'Anneau 0.18.0 embarqué (applis à mettre à jour dans « À faire quand tu veux » ; dans la démonstration, faux registres en mémoire, rien ne sort). Le faux Immich commun devient 0.4.4. **Jamais essayé sur la vraie installation.**

@@ -1,5 +1,10 @@
 # Journal des versions
 
+## 0.4.4 — 23/11/2026 (listes déroulantes lisibles en sombre)
+
+- **Listes déroulantes illisibles sur PC** (constaté par Julien dans Dîme, 23/11/2026) : la liste ouverte d'un `<select>` gardait un fond blanc tout en reprenant le texte crème de l'appli. `frontend/src/app.css` reprend le bloc du socle 0.12.2 (« Listes déroulantes (socle 0.12.2) ») : choix aux couleurs des menus, titres de groupe en gras, choix désactivés en gris.
+- Jamais essayé sur la vraie installation.
+
 ## 0.4.3 — 22/11/2026
 
 - L'Anneau 0.18.0 embarqué : « À faire quand tu veux » montre les applis de la stack à mettre à jour (ligne repliée, bouton par appli, double confirmation pour les protégés). Dans la démonstration, les registres d'images sont simulés en mémoire : rien ne sort.
