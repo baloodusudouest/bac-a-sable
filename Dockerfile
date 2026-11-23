@@ -25,100 +25,100 @@ RUN pip install --no-cache-dir --target /commun pytest==8.4.2
 FROM python:3.12-slim-bookworm AS pandoc
 ADD https://github.com/jgm/pandoc/releases/download/3.1.3/pandoc-3.1.3-1-amd64.deb /pandoc.deb
 
-# ---------- L'Anneau 0.18.0 (anneau @ 430873b) ----------
+# ---------- L'Anneau 0.18.3 (anneau @ 7e84496) ----------
 FROM python:3.12-slim-bookworm AS py-anneau
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev && rm -rf /var/lib/apt/lists/*
-ADD --keep-git-dir=false https://github.com/baloodusudouest/anneau.git#430873bd1b7991d9eb29551332cedc35f5cbe27c /src
+ADD --keep-git-dir=false https://github.com/baloodusudouest/anneau.git#7e8449638c676d478d65ab4445ff6cd3199e5c97 /src
 RUN pip install --no-cache-dir --target /site -r /src/requirements.txt && rm -rf /src/.github
 FROM node:22-bookworm-slim AS ui-anneau
 COPY --from=py-anneau /src /build
 WORKDIR /build/frontend
 RUN npm ci --no-audit --no-fund && npx vite build --outDir /out --emptyOutDir
 
-# ---------- carnet 3.3.2 (carnet @ 8df82ab) ----------
+# ---------- carnet 3.5.1 (carnet @ 403ee7f) ----------
 FROM python:3.12-slim-bookworm AS py-carnet
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev && rm -rf /var/lib/apt/lists/*
-ADD --keep-git-dir=false https://github.com/baloodusudouest/carnet.git#8df82ab90755fc5013a9d1c90b97f8f90796062a /src
+ADD --keep-git-dir=false https://github.com/baloodusudouest/carnet.git#403ee7f1fb31d2476f7491b062123f02db47d124 /src
 RUN pip install --no-cache-dir --target /site -r /src/requirements.txt && rm -rf /src/.github
 FROM node:22-bookworm-slim AS ui-carnet
 COPY --from=py-carnet /src /build
 WORKDIR /build/frontend
 RUN npm ci --no-audit --no-fund && npx vite build --outDir /out --emptyOutDir
 
-# ---------- Chambre noire 0.9.2 (chambre-noire @ 1e624a8) ----------
+# ---------- Chambre noire 0.9.3 (chambre-noire @ 7a12141) ----------
 FROM python:3.12-slim-bookworm AS py-chambre-noire
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev && rm -rf /var/lib/apt/lists/*
-ADD --keep-git-dir=false https://github.com/baloodusudouest/chambre-noire.git#1e624a8c0faa8c334468289731f77060b096c8c6 /src
+ADD --keep-git-dir=false https://github.com/baloodusudouest/chambre-noire.git#7a12141ed2f7574ae85e67cf4a9c8486e31abe5f /src
 RUN pip install --no-cache-dir --target /site -r /src/requirements.txt && rm -rf /src/.github
 FROM node:22-bookworm-slim AS ui-chambre-noire
 COPY --from=py-chambre-noire /src /build
 WORKDIR /build/frontend
 RUN npm ci --no-audit --no-fund && npx vite build --outDir /out --emptyOutDir
 
-# ---------- Comptoir 0.8.2 (comptoir @ 6cf994d) ----------
+# ---------- Comptoir 0.8.3 (comptoir @ 71aa917) ----------
 FROM python:3.12-slim-bookworm AS py-comptoir
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev && rm -rf /var/lib/apt/lists/*
-ADD --keep-git-dir=false https://github.com/baloodusudouest/comptoir.git#6cf994dcaf5dfb2567030618032b155f95e0fc12 /src
+ADD --keep-git-dir=false https://github.com/baloodusudouest/comptoir.git#71aa917c8248a2146fb0a1d8b11c20913f1d843e /src
 RUN pip install --no-cache-dir --target /site -r /src/requirements.txt && rm -rf /src/.github
 FROM node:22-bookworm-slim AS ui-comptoir
 COPY --from=py-comptoir /src /build
 WORKDIR /build/frontend
 RUN npm ci --no-audit --no-fund && npx vite build --outDir /out --emptyOutDir
 
-# ---------- Douze points 1.14.1 (douze-points @ 816690e) ----------
+# ---------- Douze points 1.14.2 (douze-points @ 777d906) ----------
 FROM python:3.12-slim-bookworm AS py-douze-points
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev && rm -rf /var/lib/apt/lists/*
-ADD --keep-git-dir=false https://github.com/baloodusudouest/douze-points.git#816690ec7f539c273256465d391fe75a5bb7c635 /src
+ADD --keep-git-dir=false https://github.com/baloodusudouest/douze-points.git#777d906ed2ab88dee0ba18cd746b9051cf209244 /src
 RUN pip install --no-cache-dir --target /site -r /src/requirements.txt && rm -rf /src/.github
 FROM node:22-bookworm-slim AS ui-douze-points
 COPY --from=py-douze-points /src /build
 WORKDIR /build/frontend
 RUN npm ci --no-audit --no-fund && npx vite build --outDir /out --emptyOutDir
 
-# ---------- Gazette 0.30.1 (gazette @ 442c70b) ----------
+# ---------- Gazette 0.30.2 (gazette @ 14a26fa) ----------
 FROM python:3.12-slim-bookworm AS py-gazette
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev && rm -rf /var/lib/apt/lists/*
-ADD --keep-git-dir=false https://github.com/baloodusudouest/gazette.git#442c70be204e066692f8ff5e348db95081a285bc /src
+ADD --keep-git-dir=false https://github.com/baloodusudouest/gazette.git#14a26fa911981fcaa1e887919362af886d3f5b3e /src
 RUN pip install --no-cache-dir --target /site -r /src/requirements.txt && rm -rf /src/.github
 FROM node:22-bookworm-slim AS ui-gazette
 COPY --from=py-gazette /src /build
 WORKDIR /build/frontend
 RUN npm ci --no-audit --no-fund && npx vite build --outDir /out --emptyOutDir
 
-# ---------- Kit d'urgence 2.7.2 (kit-urgence @ e8e8aba) ----------
+# ---------- Kit d'urgence 2.7.3 (kit-urgence @ 66967dd) ----------
 FROM python:3.12-slim-bookworm AS py-kit-urgence
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev && rm -rf /var/lib/apt/lists/*
-ADD --keep-git-dir=false https://github.com/baloodusudouest/kit-urgence.git#e8e8aba279bf30f49b4ef3a367da0ffe01a4b233 /src
+ADD --keep-git-dir=false https://github.com/baloodusudouest/kit-urgence.git#66967dd3dae1542e8a616ec63302fc13023f5ecd /src
 RUN pip install --no-cache-dir --target /site -r /src/requirements.txt && rm -rf /src/.github
 FROM node:22-bookworm-slim AS ui-kit-urgence
 COPY --from=py-kit-urgence /src /build
 WORKDIR /build/frontend
 RUN npm ci --no-audit --no-fund && npx vite build --outDir /out --emptyOutDir
 
-# ---------- Millésime 2.16.1 (millesime @ 67d78cd) ----------
+# ---------- Millésime 2.16.2 (millesime @ 21795b1) ----------
 FROM python:3.12-slim-bookworm AS py-millesime
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev && rm -rf /var/lib/apt/lists/*
-ADD --keep-git-dir=false https://github.com/baloodusudouest/millesime.git#67d78cd1d3281d942cc164a49d585d9271a16ddf /src
+ADD --keep-git-dir=false https://github.com/baloodusudouest/millesime.git#21795b1e3caa7c98d179954c67ba174b6b357c36 /src
 RUN pip install --no-cache-dir --target /site -r /src/requirements.txt && rm -rf /src/.github
 FROM node:22-bookworm-slim AS ui-millesime
 COPY --from=py-millesime /src /build
 WORKDIR /build/frontend
 RUN npm ci --no-audit --no-fund && npx vite build --outDir /out --emptyOutDir
 
-# ---------- Scriptorium 0.8.2 (scriptorium @ a3ff141) ----------
+# ---------- Scriptorium 0.8.3 (scriptorium @ 055e3ba) ----------
 FROM python:3.12-slim-bookworm AS py-scriptorium
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev && rm -rf /var/lib/apt/lists/*
-ADD --keep-git-dir=false https://github.com/baloodusudouest/scriptorium.git#a3ff1412b85fd6ffef86f38738023f9782d454a4 /src
+ADD --keep-git-dir=false https://github.com/baloodusudouest/scriptorium.git#055e3ba1c866586524e64a5ef055257b9dec59f5 /src
 RUN pip install --no-cache-dir --target /site -r /src/requirements.txt && rm -rf /src/.github
 FROM node:22-bookworm-slim AS ui-scriptorium
 COPY --from=py-scriptorium /src /build
 WORKDIR /build/frontend
 RUN npm ci --no-audit --no-fund && npx vite build --outDir /out --emptyOutDir
 
-# ---------- Sillage 0.21.2 (sillage @ 4479351) ----------
+# ---------- Sillage 0.21.3 (sillage @ e78e445) ----------
 FROM python:3.12-slim-bookworm AS py-sillage
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev && rm -rf /var/lib/apt/lists/*
-ADD --keep-git-dir=false https://github.com/baloodusudouest/sillage.git#4479351334e4fc58cd927be36a93da174199bf9a /src
+ADD --keep-git-dir=false https://github.com/baloodusudouest/sillage.git#e78e4459363f8813f53b56d3cf4ee2dbcfab67bb /src
 RUN pip install --no-cache-dir --target /site -r /src/requirements.txt && rm -rf /src/.github
 FROM node:22-bookworm-slim AS ui-sillage
 COPY --from=py-sillage /src /build
@@ -135,10 +135,10 @@ COPY --from=py-transhumance /src /build
 WORKDIR /build/frontend
 RUN npm ci --no-audit --no-fund && npx vite build --outDir /out --emptyOutDir
 
-# ---------- Éphéméride 3.3.1 (verif-dates-photos @ 8879db4) ----------
+# ---------- Éphéméride 3.3.2 (verif-dates-photos @ 9af736f) ----------
 FROM python:3.12-slim-bookworm AS py-ephemeride
 RUN apt-get update && apt-get install -y --no-install-recommends gcc libffi-dev && rm -rf /var/lib/apt/lists/*
-ADD --keep-git-dir=false https://github.com/baloodusudouest/verif-dates-photos.git#8879db43b50c09fe9f3557c16d2941c767ef639f /src
+ADD --keep-git-dir=false https://github.com/baloodusudouest/verif-dates-photos.git#9af736f875a09c576811c919fff89b486bd52eaa /src
 RUN pip install --no-cache-dir --target /site -r /src/requirements.txt && rm -rf /src/.github
 FROM node:22-bookworm-slim AS ui-ephemeride
 COPY --from=py-ephemeride /src /build

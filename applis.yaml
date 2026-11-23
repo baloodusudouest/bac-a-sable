@@ -28,8 +28,8 @@ applis:
   anneau:
     nom: L'Anneau
     depot: anneau
-    version: 0.18.0
-    sha: 430873bd1b7991d9eb29551332cedc35f5cbe27c
+    version: 0.18.3
+    sha: 7e8449638c676d478d65ab4445ff6cd3199e5c97
     port: 8110
     lanceur: demo
     module: tests.interface.serveur
@@ -42,8 +42,8 @@ applis:
   carnet:
     nom: carnet
     depot: carnet
-    version: 3.3.2
-    sha: 8df82ab90755fc5013a9d1c90b97f8f90796062a
+    version: 3.5.1
+    sha: 403ee7f1fb31d2476f7491b062123f02db47d124
     port: 8111
     lanceur: bac
     mot_de_passe: essai-bac-a-sable
@@ -54,8 +54,8 @@ applis:
   chambre-noire:
     nom: Chambre noire
     depot: chambre-noire
-    version: 0.9.2
-    sha: 1e624a8c0faa8c334468289731f77060b096c8c6
+    version: 0.9.3
+    sha: 7a12141ed2f7574ae85e67cf4a9c8486e31abe5f
     port: 8112
     lanceur: demo
     module: tools.demo
@@ -69,8 +69,8 @@ applis:
   comptoir:
     nom: Comptoir
     depot: comptoir
-    version: 0.8.2
-    sha: 6cf994dcaf5dfb2567030618032b155f95e0fc12
+    version: 0.8.3
+    sha: 71aa917c8248a2146fb0a1d8b11c20913f1d843e
     port: 8113
     lanceur: demo
     module: tools.demo
@@ -83,8 +83,8 @@ applis:
   douze-points:
     nom: Douze points
     depot: douze-points
-    version: 1.14.1
-    sha: 816690ec7f539c273256465d391fe75a5bb7c635
+    version: 1.14.2
+    sha: 777d906ed2ab88dee0ba18cd746b9051cf209244
     port: 8114
     lanceur: bac
     mot_de_passe: essai-bac-a-sable
@@ -95,8 +95,8 @@ applis:
   gazette:
     nom: Gazette
     depot: gazette
-    version: 0.30.1
-    sha: 442c70be204e066692f8ff5e348db95081a285bc
+    version: 0.30.2
+    sha: 14a26fa911981fcaa1e887919362af886d3f5b3e
     port: 8115
     lanceur: bac
     mot_de_passe: essai-bac-a-sable
@@ -107,8 +107,8 @@ applis:
   kit-urgence:
     nom: Kit d'urgence
     depot: kit-urgence
-    version: 2.7.2
-    sha: e8e8aba279bf30f49b4ef3a367da0ffe01a4b233
+    version: 2.7.3
+    sha: 66967dd3dae1542e8a616ec63302fc13023f5ecd
     port: 8116
     lanceur: demo
     module: tests.interface.serveur
@@ -122,8 +122,8 @@ applis:
   millesime:
     nom: Millésime
     depot: millesime
-    version: 2.16.1
-    sha: 67d78cd1d3281d942cc164a49d585d9271a16ddf
+    version: 2.16.2
+    sha: 21795b1e3caa7c98d179954c67ba174b6b357c36
     port: 8117
     lanceur: demo
     module: tests.interface.serveur
@@ -136,8 +136,8 @@ applis:
   scriptorium:
     nom: Scriptorium
     depot: scriptorium
-    version: 0.8.2
-    sha: a3ff1412b85fd6ffef86f38738023f9782d454a4
+    version: 0.8.3
+    sha: 055e3ba1c866586524e64a5ef055257b9dec59f5
     port: 8118
     lanceur: demo
     module: tools.demo
@@ -150,8 +150,8 @@ applis:
   sillage:
     nom: Sillage
     depot: sillage
-    version: 0.21.2
-    sha: 4479351334e4fc58cd927be36a93da174199bf9a
+    version: 0.21.3
+    sha: e78e4459363f8813f53b56d3cf4ee2dbcfab67bb
     port: 8119
     lanceur: demo
     module: tests.interface.serveur
@@ -178,8 +178,8 @@ applis:
   ephemeride:
     nom: Éphéméride
     depot: verif-dates-photos
-    version: 3.3.1
-    sha: 8879db43b50c09fe9f3557c16d2941c767ef639f
+    version: 3.3.2
+    sha: 9af736f875a09c576811c919fff89b486bd52eaa
     port: 8121
     lanceur: demo
     module: tests/interface/serveur.py

@@ -1,5 +1,11 @@
 # Journal des versions
 
+## 0.4.5 — 23/11/2026 (applis du jour embarquées)
+
+- **Toutes les applis embarquées aux versions du 23/11/2026** (listes déroulantes lisibles en sombre, socle 0.12.2) : L'Anneau 0.18.3, carnet 3.5.1 (avec les nouveautés de la 3.5 : alimentation vers Home Assistant, conjoint et couple dans Treemich, livre d'or), Chambre noire 0.9.3, Comptoir 0.8.3, Douze points 1.14.2, Gazette 0.30.2, Kit d'urgence 2.7.3, Millésime 2.16.2, Scriptorium 0.8.3, Sillage 0.21.3, Éphéméride 3.3.2. Transhumance reste en 0.9.5 (en cours de travail). Dîme n'est pas embarquée (dépôt privé).
+- Essai ici de la maison branchée avec carnet 3.5.1, Douze points 1.14.2 et Gazette 0.30.2 bâtis depuis leurs dépôts : 9 essais verts (le PDF de la Gazette, qui demande Chromium, non rejoué).
+- Lanceurs inchangés. Jamais essayé sur la vraie installation.
+
 ## 0.4.4 — 23/11/2026 (listes déroulantes lisibles en sombre)
 
 - **Listes déroulantes illisibles sur PC** (constaté par Julien dans Dîme, 23/11/2026) : la liste ouverte d'un `<select>` gardait un fond blanc tout en reprenant le texte crème de l'appli. `frontend/src/app.css` reprend le bloc du socle 0.12.2 (« Listes déroulantes (socle 0.12.2) ») : choix aux couleurs des menus, titres de groupe en gras, choix désactivés en gris.
