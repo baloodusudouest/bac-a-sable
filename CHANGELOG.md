@@ -1,5 +1,10 @@
 # Journal des versions
 
+## 0.4.6 — 26/11/2026 (L'Anneau 0.20.0 embarqué)
+
+- **L'Anneau 0.20.0 embarqué** (avec la 0.19.0) : réglages en cinq thèmes, secrets en https vérifiés par le serveur, bouton « Réveiller » du PC de calcul (dans la démonstration, faux Home Assistant en mémoire : rien ne sort), homelab collé et homelab avec ses valeurs (dans la page seulement). `applis.yaml` (version, commit `deda90b`), `Dockerfile` régénéré par `tools/dockerfile.py`.
+- Essai ici : l'Anneau 0.20.0 démarre dans le Bac à sable et s'ouvre par le relais, aucune sortie refusée (`test_chaque_appli_demarre_et_s_ouvre_par_le_relais[anneau]`). Lanceurs inchangés. Jamais essayé sur la vraie installation.
+
 ## 0.4.5 — 23/11/2026 (applis du jour embarquées)
 
 - **Toutes les applis embarquées aux versions du 23/11/2026** (listes déroulantes lisibles en sombre, socle 0.12.2) : L'Anneau 0.18.3, carnet 3.5.1 (avec les nouveautés de la 3.5 : alimentation vers Home Assistant, conjoint et couple dans Treemich, livre d'or), Chambre noire 0.9.3, Comptoir 0.8.3, Douze points 1.14.2, Gazette 0.30.2, Kit d'urgence 2.7.3, Millésime 2.16.2, Scriptorium 0.8.3, Sillage 0.21.3, Éphéméride 3.3.2. Transhumance reste en 0.9.5 (en cours de travail). Dîme n'est pas embarquée (dépôt privé).

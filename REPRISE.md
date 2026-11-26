@@ -3,6 +3,8 @@
 Fichier à lire en premier dans une nouvelle session, et à mettre à jour à chaque fin de session, dans le même commit
 que le code.
 
+## État (26/11/2026) — 0.4.6 : L'Anneau 0.20.0 embarqué (`applis.yaml` commit deda90b, `Dockerfile` régénéré) ; essai de démarrage par le relais vert ici (anneau seul, `BAC_ESSAI_APPLIS`). Jamais essayé sur la vraie installation.
+
 ## État (23/11/2026) — 0.4.5 : applis embarquées aux versions du 23/11/2026 (`applis.yaml`, `Dockerfile` régénéré par `tools/dockerfile.py`) ; maison branchée rejouée ici avec carnet 3.5.1, Douze points 1.14.2, Gazette 0.30.2 (`BAC_ESSAI_APPLIS`), 9 verts. Jamais essayé sur la vraie installation.
 
 ## État (23/11/2026) — 0.4.4 : listes déroulantes lisibles en sombre (`frontend/src/app.css`, bloc « Listes déroulantes (socle 0.12.2) » : `select option, select optgroup` aux couleurs `--popover`). Jamais essayé sur la vraie installation.

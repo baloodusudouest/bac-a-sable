@@ -28,8 +28,8 @@ applis:
   anneau:
     nom: L'Anneau
     depot: anneau
-    version: 0.18.3
-    sha: 7e8449638c676d478d65ab4445ff6cd3199e5c97
+    version: 0.20.0
+    sha: deda90bf3e9eedd653d67497566ddbc144994a2c
     port: 8110
     lanceur: demo
     module: tests.interface.serveur
